@@ -1,0 +1,76 @@
+[
+  {
+    "imageIndex": 0,
+    "annotations": [
+      {
+        "startX": 2962.047883157169,
+        "startY": 2116.752,
+        "width": 2098.1960784313724,
+        "height": 787.9680000000003,
+        "class": "Delamination",
+        "severity": "minor",
+        "color": "#FF5733"
+      }
+    ]
+  },
+  {
+    "imageIndex": 1,
+    "annotations": [
+      {
+        "startX": 437.655726294424,
+        "startY": 723.216,
+        "width": 1790.0235294117645,
+        "height": 882.8159999999999,
+        "class": "Paint",
+        "severity": "minor",
+        "color": "#1E90FF"
+      }
+    ]
+  },
+  {
+    "imageIndex": 2,
+    "annotations": [
+      {
+        "startX": 1506.4243537454042,
+        "startY": 628.368,
+        "width": 3527.5921568627455,
+        "height": -313.728,
+        "class": "Seepage",
+        "severity": "minor",
+        "color": "#32CD32"
+      }
+    ]
+  },
+  {
+    "imageIndex": 3,
+    "annotations": [
+      {
+        "startX": 1316.2753341375612,
+        "startY": 1095.3120000000001,
+        "width": 2852.235294117647,
+        "height": 1408.128,
+        "class": "Paint",
+        "severity": "minor",
+        "color": "#1E90FF"
+      },
+      {
+        "startX": 4975.004745902267,
+        "startY": 1474.7040000000002,
+        "width": 458.98039215686276,
+        "height": 963.0719999999997,
+        "class": "Leakage",
+        "severity": "minor",
+        "color": "#FFD700"
+      },
+      {
+        "startX": 509.7812164905024,
+        "startY": 2817.168,
+        "width": 1173.678431372549,
+        "height": 598.2719999999999,
+        "class": "Seepage",
+        "severity": "minor",
+        "color": "#32CD32"
+      }
+    ]
+  }
+]
