@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building with Clickable Points</title>
+  <style>
+     @media (max-width: 768px) {
+    body {
+        flex-direction: column; /* Stack elements vertically */
+        animation: gradientAnimation 15s ease infinite;
+        background: linear-gradient( #ffffff, #8aadd9) !important;
+
+    }
+    
+    .sidebar {
+        width: 100%; /* Full width for sidebar */
+        border-bottom: 2px solid #ccc; /* Border for separation */
+        animation: gradientAnimation 15s ease infinite;
+        background: linear-gradient( #ffffff, #8aadd9);
+
+      }
+
+   
+    .details {
+        width: 100%; /* Full width for details */
+        margin-left: 0; /* No margin on mobile */
+    }
+    .main-content {
+        width: 100%; /* Full width for main content */
+        height: 300px; /* Set a fixed height for mobile */
+        animation: gradientAnimation 15s ease infinite;
+        background: linear-gradient( #ffffff, #8aadd9);
+
+    }
+
+}
+#thumbnail-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 9%;
+  height: 200px;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  animation: gradientAnimation 15s ease infinite;
+  background: linear-gradient(#8aadd9);
+
+  overflow-x: auto; /* Add horizontal scrolling */
+  overflow-y: hidden; /* Remove vertical scrolling */
+  white-space: nowrap; /* Prevent wrapping of images */
+  display: flex; /* Add display: flex */
+  gap: 10px;
+}
+#thumbnail-container img {
+  /* width: 200px;
+  height: 200px; */
+  margin: 0 10px;  /* Remove margin */
+  padding-right: 10; /* Remove padding */
+  cursor: pointer;
+  display: inline-block; /* Display images inline */
+  vertical-align: top; /* Align images to the top */
+  height: 100%; /* Make images take full height */
+}
+.main-content {
+      flex: 1; /* Take remaining space */
+      position: relative;
+      padding: 10px; /* Add padding for better spacing */
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      height: 100vh;
+      animation: gradientAnimation 15s ease infinite;
+      background: linear-gradient( #ffffff, #8aadd9);
+
+    }
+
+    .container {
+      display: flex;
+      flex: 1; /* Allow container to grow and fill remaining space */
+    }
+
+    /* Sidebar styles */
+    
+
+    /* Main content styles */
+    
+
+    /* Details styles */
+    .details {
+      width: 400px;
+      padding: 10px;
+      background-color: #e0e0e0; /* Light background for visibility */
+      margin-left: 10px; /* Space between main content and details */
+    }
+
+    #overlay {
+      position: absolute;
+      top: 200px;
+      left: 955px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 0px;
+      display: none;
+      z-index: 1000;
+    }
+    #overlay img {
+      max-width: 250px;
+    }
+    
+
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+          font-family: "Changa", sans-serif;
+
+        }
+
+        /* Header styling */
+        header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        /* Hamburger menu icon */
+        /* Hamburger menu icon */
+.menu-icon {
+    width: 40px; /* Increased width */
+    height: 30px; /* Set height to accommodate all lines */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensure even spacing between lines */
+    cursor: pointer;
+    z-index: 9999;
+}
+
+.line {
+    width: 100%;
+    height: 4px;
+    background-color: black;
+    margin: 0; /* Remove margin to avoid gaps between lines */
+    transition: all 0.3s ease;
+}
+
+
+        /* Navigation bar */
+        nav {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 200px;
+            background-color: rgba(5, 21, 123, 0.5);
+            transform: translateX(100%);
+            transition: transform 0.5s ease;
+            z-index: 9998;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 50px 20px;
+        }
+
+        nav ul li {
+            margin: 20px 0;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: lightgray;
+        }
+
+        /* Sections styling */
+        section {
+            padding: 100px 20px;
+            height: 100vh;
+        }
+
+        #home {
+            background-color: lightblue;
+        }
+
+        #services {
+            background-color: lightgreen;
+        }
+
+        /* Active navigation */
+        .nav-visible {
+            transform: translateX(0);
+        }
+        .close-icon {
+    font-size: 30px; /* Size of the close icon */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    margin: 10px; /* Spacing from the edges */
+    color: black; /* Color of the icon */
+}
+/*#threejs-canvas {
+  border: 5px solid #000;
+  border-radius: 15px;
+  height: 100%; 
+  width: 100%;
+  box-sizing: border-box;
+}*/
+#threejs-canvas {
+  border: 2px solid #000; /* Keep the border thickness */
+  border-radius: 15px; /* Maintain rounded corners */
+  height: 80%; /* Full height */
+  width: 90%; /* Full width */
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+  margin: 0; /* Remove any margin if there is any */
+}
+
+
+.main-content {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+/*#thumbnail-container {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  height: 200px;
+  background-color: white;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  overflow-x: auto; 
+  white-space: nowrap; 
+  display: flex;
+  gap: 10px;
+}
+*/
+#thumbnail-container img {
+  width: 350px;
+  height: 100%; 
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: top;
+}
+#thumbnail-container {
+  position: relative;
+  margin-right: 20%;
+  width: 78%; /* Full width */
+  height: 200px; /* Adjust height as needed */
+  background-color: linear-gradient(#8aadd9);
+  padding: 10px;
+  animation: gradientAnimation 15s ease infinite;
+
+  border-top: 1px solid #ccc;
+  overflow-x: auto; /* Enables horizontal scrollbar */
+  overflow-y: hidden; /* Hides vertical scrollbar */
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  scroll-behavior: smooth; /* Smooth scrolling */
+}
+
+#thumbnail-container::-webkit-scrollbar {
+  gap:2px;
+  height: 8px; /* Adjust height of scrollbar */
+}
+
+#thumbnail-container::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of scrollbar */
+  border-radius: 10px;
+}
+
+#thumbnail-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Hover color */
+}
+
+
+/* Sidebar styles */
+.sidebar {
+  width: 300px;
+  animation: gradientAnimation 15s ease infinite;
+  background: linear-gradient( #ffffff, #8aadd9);
+padding: 10px;
+  overflow-y: auto; /* Scroll if content exceeds the height */
+  flex-shrink: 0; /* Prevent sidebar from shrinking */
+  display: flex;
+  flex-direction: column; /* Stack images vertically */
+  gap: 10px; /* Space between images */
+}
+
+/* Sidebar image styles */
+/* Sidebar image styles */
+.sidebar img {
+  width: 100%; /* Full width of the sidebar */
+  height: 450px; /* Set a fixed height for images */
+  object-fit: cover; /* Ensure images cover the area without distortion */
+  border: 2px solid #ccc; /* Border around images */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transition for effects */
+}
+
+/* Hover effect */
+.sidebar img:hover {
+  transform: scale(1.05); /* Scale image on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+
+/*.info-box {
+  width:240px;
+  position: absolute; 
+  bottom: 440px; 
+  right: 20px; 
+  background-color: rgba(255, 255, 255, 0.9); 
+  border: 2px solid #ccc; 
+  border-radius: 10px; 
+  padding: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  display: flex; 
+  align-items: center; 
+  animation: float 3s ease-in-out infinite; 
+} */
+
+.animated-gif {
+  width: 50px; /* Set a size for the animated GIF */
+  height: 50px; /* Set a size for the animated GIF */
+  margin-right: 10px; /* Space between the GIF and text */
+}
+
+.moving-text {
+  font-size: 16px; /* Font size for the text */
+  animation: bounce 1.5s ease infinite; /* Bounce animation */
+}
+
+/* Keyframes for floating effect */
+@keyframes float {
+  0% { transform: translatey(0px); }
+  50% { transform: translatey(-10px); }
+  100% { transform: translatey(0px); }
+}
+
+/* Keyframes for bouncing text */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px); /* Higher bounce */
+  }
+  60% {
+    transform: translateY(-5px); /* Lower bounce */
+  }
+}
+
+
+
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="menu-icon" onclick="toggleNav()">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+</header>
+<nav id="navbar" class="nav-hidden">
+    <div class="close-icon" onclick="toggleNav()">&times;</div> <!-- Close icon -->
+    <ul>
+        <li><a href="afterlogin.html">Menu</a></li>
+        <li><a href="annotation-new_1.html">Annotation</a></li>
+        <li><a href="drone-tab-new.html">Drone-tab</a></li>
+    </ul>
+</nav>
+
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <img src="./static/0000.jpg" alt="Image 1" onclick="rotateModelToFacePoint(points[0].position)">
+      <img src="./static/0001.jpg" alt="Image 8" onclick="rotateModelToFacePoint(points[1].position)" >
+      <img src="./static/0014.jpg" alt="Image 8">
+      <img src= "./static/0015.jpg" alt="Image 8">
+      <img src="./static/0022.jpg" alt="Image 8">
+      <img src="./static/0025.jpg" alt="Image 8">
+      <img src="./static/0032.jpg" alt="Image 2">
+      <img src="./static/0036.jpg" alt="Image 3">
+      <img src="./static/0046.jpg" alt="Image 4">
+      <img src="./static/0054.jpg" alt="Image 5">
+      <img src="./static/building3.png" alt="Image 6">
+      <img src="./static/building2.png" alt="Image 7">
+      <img src="./static/22.png" alt="Image 8">
+      <img src="./static/23.png" alt="Image 8">
+      <img src= "./static/24.png" alt="Image 8">
+      <img src="./static/25.png" alt="Image 8">
+      <img src="./static/26.png" alt="Image 8">
+
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content">
+      <canvas id="threejs-canvas"></canvas>
+      <!-- Overlay with main image -->
+      <div id="overlay">
+        <img id="overlay-image" src="" alt="Building Image" />
+      </div>
+      <!-- Thumbnails container -->
+      <div id="thumbnail-container">
+        <!-- Thumbnails will be added dynamically here -->
+      </div>
+    </div>
+    <!-- Text Box with Animated Text -->
+<!-- Text Box with Animated Text -->
+<!-- Text Box with Animated Text -->
+<div class="info-box">
+ <!-- <img class="animated-gif" src="https://media.giphy.com/media/gg0sAafx4kZPrJff3K/giphy.gif?cid=790b7611klkp32ls74ggizinqdvxz3772psop7yimxpm0x4a&ep=v1_gifs_search&rid=giphy.gif&ct=g" alt="Animated Person">-->
+ <!-- <div class="moving-text">Click dot to display cracks, seepage, etc.</div>-->
+</div>
+
+
+  
+    <!-- Details section 
+    <div class="details">
+      <h3>Crack</h3>
+      <div class="slider" style="margin-top: 10px;">
+        <label for="severity">Severity</label>
+        <input id="severity" name="severity" type="range" min="0" max="5"/>
+      </div>
+      <textarea class="comment" placeholder="Enter comment here." style="margin-top: 10px; width: 100%; height: 100px;"></textarea>
+    </div>
+  </div>
+-->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.min.js"></script> -->
+  <script>
+    function scrollThumbnails(direction) {
+  const container = document.getElementById("thumbnail-container");
+  const scrollAmount = 150; // Pixels to scroll per click, adjust as needed
+  container.scrollBy({
+    left: direction * scrollAmount,
+    behavior: "smooth"
+  });
+}
+
+    // Function to toggle navigation visibility
+    function toggleNav() {
+    var nav = document.getElementById('navbar');
+    var lines = document.querySelectorAll('.line');
+
+    // Toggle the 'nav-visible' class to open/close the navigation
+    nav.classList.toggle('nav-visible');
+
+    // Update the appearance of the hamburger icon
+    lines.forEach((line) => {
+        if (nav.classList.contains('nav-visible')) {
+            line.classList.add('open'); // Change to X
+        } else {
+            line.classList.remove('open'); // Change back to hamburger
+        }
+    });
+}
+
+// Close the navigation bar when clicking outside of it
+document.addEventListener('click', function(event) {
+    var nav = document.getElementById('navbar');
+    var menuIcon = document.querySelector('.menu-icon');
+    var closeIcon = document.querySelector('.close-icon');
+
+    // Check if click is outside the navigation and menu icon
+    if (!nav.contains(event.target) && !menuIcon.contains(event.target) && !closeIcon.contains(event.target)) {
+        nav.classList.remove('nav-visible'); // Close the navigation
+        var lines = document.querySelectorAll('.line');
+        lines.forEach(line => line.classList.remove('open')); // Change back to hamburger
+    }
+});
+
+// Optional: You can use this function for navigation
+function goHome() {
+    alert("Navigating to Home!");
+}
+
+  </script>
+
+  <script type="module" >
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js";
+import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+import { PLYLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/PLYLoader.js";
+// Initialize scene, camera, and renderer
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  5,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(80, 10, 30);
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById("threejs-canvas"),
+  antialias: true,
+  alpha: true, // Allows transparency
+});
+renderer.setSize(window.innerWidth - 600, window.innerHeight - 200); // Adjust size for sidebar, details, and thumbnails
+renderer.setClearColor(0xffffff); // Set background to white
+
+// Add light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(10, 10, 10);
+scene.add(directionalLight);
+
+// Add OrbitControls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Load the building model (GLB)
+
+const plyLoader = new PLYLoader();
+plyLoader.load(
+  "./models/Resonance.ply", // Path to your .ply model
+  (geometry) => {
+    // Check if the geometry has vertex colors
+    if (geometry.hasAttribute('color')) {
+      console.log("Vertex colors found in the .ply file.");
+    } else {
+      console.log("No vertex colors found in the .ply file.");
+    }
+
+    // Create a material that supports vertex colors
+    const material = new THREE.MeshStandardMaterial({
+      vertexColors: true, // Enable vertex colors
+      flatShading: true,  // Optional: Use flat shading for better color visibility
+    });
+
+    // Create a mesh from the geometry and material
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = Math.PI;
+    mesh.position.z += 5; // Adjust this value as needed
+
+    // Add the mesh to the scene
+    scene.add(mesh);
+
+    // Center the object (optional, adjust as needed)
+    const box = new THREE.Box3().setFromObject(mesh);
+    const center = box.getCenter(new THREE.Vector3());
+    mesh.position.sub(center);
+  },
+  undefined,
+  (error) => {
+    console.error("Error loading .ply model:", error);
+  }
+);
+
+// Add clickable points
+const points = [
+  {
+    position: new THREE.Vector3(-4.1, 0, 0),
+    image: "./static/0000.jpg",
+    thumbnailImages : [
+  "./static/0000.jpg",
+  "./static/1110.jpg",
+  "./static/0111.jpg",
+  "./static/0124.jpg",
+  "./static/0150.jpg",
+  "./static/0152.jpg",
+  "./static/0131.jpg",
+],
+  },
+  {
+    position: new THREE.Vector3(-4.1, 0.4, 1),
+    image: "/static/0000.jpg",
+    thumbnailImages : [
+  "./static/0000.jpg",
+  "./static/0102.jpg",
+  "./static/0096.jpg",
+  "./static/0089.jpg",
+  "./static/0080.jpg",
+  "./static/0151.jpg",
+
+]
+  },
+  {
+    position: new THREE.Vector3(-7.2, .5, -0.7),
+    image: "./static/31.png",
+    thumbnailImages : [
+  "./static/31.png",
+  "./static/32.png",
+  "./static/33.png",
+  "./static/34.png",
+  "./static/35.png",
+  "./static/36.png",
+]
+  },
+];
+
+// ...
+
+// Add event listeners to the sidebar images
+const sidebarImages = document.querySelectorAll('.sidebar img');
+
+sidebarImages.forEach((image, index) => {
+  image.addEventListener('click', () => {
+    const point = points[index];
+    rotateModelToFacePoint(point.position);
+  });
+});
+
+window.rotateModelToFacePoint = function(pointPosition) {
+  console.log('Rotating model to face point');
+  // ...
+}
+// Function to rotate the model to face a point
+function rotateModelToFacePoint(pointPosition) {
+  console.log('Rotating model to face point');
+
+  const mesh = scene.getObjectByProperty('name', 'mesh'); // Assuming the mesh has a name 'mesh'
+  if (mesh) {
+    const vector = new THREE.Vector3();
+    vector.copy(pointPosition);
+    vector.sub(camera.position); // Calculate the direction from the camera to the point
+    vector.normalize(); // Normalize the vector
+
+    // Calculate the rotation needed to face the point
+    const rotation = new THREE.Quaternion();
+    rotation.setFromUnitVectors(new THREE.Vector3(0, 0, -1), vector); // Rotate to face the point
+
+    // Animate the rotation
+    const animationDuration = 1000; // Duration of the animation in milliseconds
+    const startTime = performance.now();
+    const animation = () => {
+      const currentTime = performance.now();
+      const progress = (currentTime - startTime) / animationDuration;
+      if (progress < 1) {
+        mesh.quaternion.slerp(rotation, progress); // Interpolate the rotation
+        requestAnimationFrame(animation);
+      } else {
+        mesh.quaternion.copy(rotation); // Set the final rotation
+      }
+    };
+    animation();
+  }
+}
+
+// ...
+const pointMeshes = points.map((point) => {
+  const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const sphere = new THREE.Mesh(geometry, material);
+  sphere.position.copy(point.position);
+  scene.add(sphere);
+  return sphere;
+});
+
+// Convert 3D position to 2D screen coordinates
+function toScreenPosition(obj, camera) {
+  const vector = new THREE.Vector3();
+  const widthHalf = 0.5 * renderer.domElement.clientWidth; // Use clientWidth
+  const heightHalf = 0.5 * renderer.domElement.clientHeight; // Use clientHeight
+
+  obj.updateMatrixWorld();
+  vector.setFromMatrixPosition(obj.matrixWorld);
+  vector.project(camera);
+
+  vector.x = vector.x * widthHalf + widthHalf;
+  vector.y = -(vector.y * heightHalf) + heightHalf;
+
+  return { x: vector.x, y: vector.y };
+}
+
+// Update the main image when a thumbnail is clicked
+function updateMainImage(imageSrc) {
+  const overlayImage = document.getElementById("overlay-image");
+  overlayImage.src = imageSrc;
+}
+
+// Add thumbnails corresponding to the clickable points
+// const thumbnailImages = [
+//   "./static/building.png",
+//   "./static/building2.png",
+//   "./static/building3.png",
+//   "./static/building4.png",
+//   "./static/building5.png",
+//   "./static/building5.png",
+//   "./static/building5.png",
+// ];
+
+// Create a larger bounding sphere around each point
+const boundingSpheres = points.map((point) => {
+  const geometry = new THREE.SphereGeometry(0.7, 16, 16); // Adjust the radius as needed
+  const material = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0, transparent: true });
+  const sphere = new THREE.Mesh(geometry, material);
+  sphere.position.copy(point.position);
+  scene.add(sphere);
+  return sphere;
+});
+
+// Update the click event handler
+document.addEventListener("click", (event) => {
+  const thumbnailContainer = document.getElementById("thumbnail-container");
+  if (thumbnailContainer.contains(event.target)) {
+    return; // Ignore clicks on thumbnails
+  }
+
+  const mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / (window.innerHeight - 200)) * 2 + 1; // Adjust for thumbnails container
+
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(boundingSpheres);
+
+  if (intersects.length > 0) {
+    const clickedPoint = intersects[0].object;
+
+    // Find the corresponding point in the points array
+    const point = points.find((p) => 
+      Math.abs(p.position.x - clickedPoint.position.x) < 0.1 &&
+      Math.abs(p.position.y - clickedPoint.position.y) < 0.1 &&
+      Math.abs(p.position.z - clickedPoint.position.z) < 0.1
+    );
+
+    if (point) {
+      const overlayImage = document.getElementById("overlay-image");
+      overlayImage.src = point.image;
+      const overlay = document.getElementById("overlay");
+      overlay.style.display = "block";
+
+      // Update thumbnails
+      thumbnailContainer.innerHTML = "";
+      point.thumbnailImages.forEach((imageSrc) => {
+        const imgElement = document.createElement("img");
+        imgElement.src = imageSrc;
+        imgElement.style.width = "200px";
+        imgElement.style.height = "200px";
+        imgElement.style.cursor = "pointer";
+        imgElement.addEventListener("click", () => updateMainImage(imageSrc));
+        thumbnailContainer.appendChild(imgElement);
+      });
+    }
+  } else {
+    const overlay = document.getElementById("overlay");
+    overlay.style.display = "none";
+  }
+});
+
+// Handle window resizing
+window.addEventListener("resize", () => {
+  const canvasContainer = document.getElementById("threejs-canvas");
+  camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight - 200); // Adjust size for sidebar, details, and thumbnails
+});
+
+// Animation loop
+const renderloop = () => {
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(renderloop);
+};
+
+renderloop();
+
+const urlParams = new URLSearchParams(window.location.search);
+const projectId = urlParams.get("project_id"); // Get project_id from URL
+
+function updateLinks() {
+  if (projectId) {
+    const links = document.querySelectorAll("#navbar a");
+    links.forEach((link, index) => {
+      // Skip the first link (index 0)
+      if (index !== 0) {
+        const url = new URL(link.href);
+        url.searchParams.set("project_id", projectId); // Append project_id to the URL
+        link.href = url.toString(); // Update the link's href attribute
+      }
+    });
+  }
+}
+
+window.onload = updateLinks;
+
+
+  </script>
+</body>
+</html>

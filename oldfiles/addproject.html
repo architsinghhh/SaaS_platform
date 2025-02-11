@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Project with Images and Model</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { max-width: 500px; margin: auto; }
+        input, button { display: block; margin: 10px 0; padding: 8px; width: 100%; }
+        label { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Submit Your Project</h2>
+    <form id="uploadForm">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="project">Project Name</label>
+        <input type="text" id="project" name="project" required>
+
+        <label for="images">Select Images</label>
+        <input type="file" id="images" name="images" multiple accept="image/*" required>
+
+        <!-- <label for="model">Select Model File (.glb, .obj, .ply)</label>
+        <input type="file" id="model" name="model" accept=".glb,.obj,.ply" required> -->
+
+        <button type="submit">Submit</button>
+        <button type="button" id="goHomeButton">Go to Home</button> <!-- Change to type="button" -->
+    </form>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData();
+            formData.append('username', document.getElementById('username').value);
+            formData.append('password', document.getElementById('password').value);
+            formData.append('project', document.getElementById('project').value);
+            
+            // Add selected images
+            const images = document.getElementById('images').files;
+            for (let i = 0; i < images.length; i++) {
+                formData.append('images', images[i]);
+            }
+
+            // Add the selected model file
+            const modelFile = document.getElementById('model').files[0];
+            formData.append('model', modelFile);
+
+            try {
+                // Make the API call to your Flask backend
+                const response = await fetch('http://localhost:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Project and files uploaded successfully!');
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error uploading project:', error);
+                alert('An error occurred while uploading. Please try again.');
+            }
+        });
+
+        document.getElementById('goHomeButton').addEventListener('click', function() {
+            // Redirect to afterlogin.html
+            window.location.href = 'afterlogin.html';
+        });
+        
+    </script>
+</body>
+</html>

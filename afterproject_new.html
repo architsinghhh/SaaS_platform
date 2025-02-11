@@ -1,0 +1,763 @@
+<!-- flip-card-container -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features</title>
+    <link rel="stylesheet" href="styles.css"> <!-- External CSS -->
+    <style>
+        /* 
+    ================================
+        Best Viewed In Full Page
+    ================================
+*/
+
+/* Hover over a card to flip, can tab too. */
+
+@import url('https://fonts.googleapis.com/css?family=Lato');
+
+/* default */
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* body */
+body {
+  min-height: 100vh;
+  padding: 40px;
+  font-family: "Changa", sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  animation: gradientAnimation 15s ease infinite;
+  background: linear-gradient( #ffffff, #8aadd9);
+}
+
+/* .flip-card-container */
+.flip-card-container {
+  --hue: 150;
+  --primary: hsl(var(--hue), 50%, 50%);
+  --white-1: hsl(0, 0%, 90%);
+  --white-2: hsl(0, 0%, 80%);
+  --dark: hsl(var(--hue), 25%, 10%);
+  --grey: hsl(0, 0%, 50%);
+  width: 310px;
+  height: 500px;
+  margin: 40px;
+
+  perspective: 1000px;
+}
+
+/* .flip-card */
+.flip-card {
+  width: inherit;
+  height: inherit;
+
+  position: relative;
+  transform-style: preserve-3d;
+  transition: .6s .1s;
+}
+
+/* hover and focus-within states */
+.flip-card-container:hover .flip-card,
+.flip-card-container:focus-within .flip-card {
+  transform: rotateY(180deg);
+}
+
+/* .card-... */
+.card-front,
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+
+  background: var(--dark);
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+
+  backface-visibility: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* .card-front */
+.card-front {
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+/* .card-back */
+.card-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+/* figure */
+figure {
+  z-index: -1;
+}
+
+/* figure, .img-bg */
+figure,
+.img-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+}
+
+/* img */
+img {
+  height: 100%;
+  border-radius: 24px;
+}
+
+/* figcaption */
+figcaption {
+  display: block;
+
+  width: auto;
+  margin-top: 12%;
+  padding: 8px 22px;
+
+  font-weight: bold;
+  line-height: 1.6;
+  letter-spacing: 2px;
+  word-spacing: 6px;
+  text-align: right;
+
+  position: absolute;
+  top: 0;
+  right: 12px;
+
+  color: var(--white-1);
+  background: hsla(var(--hue), 25%, 10%, .5);
+}
+
+/* .img-bg */
+.img-bg {
+  background: hsla(var(--hue), 25%, 10%, .5);
+}
+
+.card-front .img-bg {
+  clip-path: polygon(0 20%, 100% 40%, 100% 100%, 0 100%);
+}
+
+.card-front .img-bg::before {
+  content: "";
+
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(18deg);
+
+  width: 100%;
+  height: 6px;
+  border: 1px solid var(--primary);
+  border-left-color: transparent;
+  border-right-color: transparent;
+
+  transition: .1s;
+}
+
+.card-back .img-bg {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 60%);
+}
+
+/* hover state */
+.flip-card-container:hover .card-front .img-bg::before {
+  width: 6px;
+  border-left-color: var(--primary);
+  border-right-color: var(--primary);
+}
+
+/* ul */
+ul {
+  padding-top: 50%;
+  margin: 0 auto;
+  width: 70%;
+  height: 100%;
+
+  list-style: none;
+  color: var(--white-1);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* li */
+li {
+  width: 100%;
+  margin-top: 12px;
+  padding-bottom: 12px;
+
+  font-size: 14px;
+  text-align: center;
+
+  position: relative;
+}
+
+li:nth-child(2n) {
+  color: var(--white-2);
+}
+
+li:not(:last-child)::after {
+  content: "";
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: 1px;
+
+  background: currentColor;
+  opacity: .2;
+}
+
+/* button */
+button {
+  font-family: "Changa", sans-serif;
+  font-weight: bold;
+  color: var(--white-1);
+
+  letter-spacing: 2px;
+
+  padding: 9px 20px;
+  border: 1px solid var(--grey);
+  border-radius: 1000px;
+  background: transparent;
+  transition: .3s;
+
+  cursor: pointer;
+}
+
+button:hover,
+button:focus {
+  color: var(--primary);
+  background: hsla(var(--hue), 25%, 10%, .2);
+  border-color: currentColor;
+}
+
+button:active {
+  transform: translate(2px);
+}
+
+/* .design-container */
+.design-container {
+  --tr: 90;
+  --op: .5;
+
+  width: 100%;
+  height: 100%;
+
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  pointer-events: none;
+}
+
+/* .design */
+.design {
+  display: block;
+
+  background: var(--grey);
+  position: absolute;
+
+  opacity: var(--op);
+  transition: .3s;
+}
+
+.design--1,
+.design--2,
+.design--3,
+.design--4 {
+  width: 1px;
+  height: 100%;
+}
+
+.design--1,
+.design--2 {
+  top: 0;
+  transform: translateY(calc((var(--tr) - (var(--tr) * 2)) * 1%))
+}
+
+.design--1 {
+  left: 20%;
+}
+
+.design--2 {
+  left: 80%;
+}
+
+.design--3,
+.design--4 {
+  bottom: 0;
+  transform: translateY(calc((var(--tr) + (var(--tr) - var(--tr))) * 1%))
+}
+
+.design--3 {
+  left: 24%;
+}
+
+.design--4 {
+  left: 76%;
+}
+
+.design--5,
+.design--6,
+.design--7,
+.design--8 {
+  width: 100%;
+  height: 1px;
+}
+
+.design--5,
+.design--6 {
+  left: 0;
+  transform: translateX(calc((var(--tr) - (var(--tr) * 2)) * 1%));
+}
+
+.design--5 {
+  top: 41%;
+}
+
+.design--6 {
+  top: 59%;
+}
+
+.design--7,
+.design--8 {
+  right: 0;
+  transform: translateX(calc((var(--tr) + (var(--tr) - var(--tr))) * 1%))
+}
+
+.design--7 {
+  top: 44%;
+}
+
+.design--8 {
+  top: 56%;
+}
+
+/* states */
+button:hover+.design-container,
+button:active+.design-container,
+button:focus+.design-container {
+  --tr: 20;
+  --op: .7;
+}
+
+.abs-site-link {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  color: hsla(0, 0%, 100%, .6);
+  font-size: 16px;
+  font-family: "Changa", sans-serif;
+}
+
+.header { 
+  position: fixed; /* Fix the header at the top */
+  top: 0;
+  left: 0;
+  width: 100%; /* Stretch across the width */
+  display: flex;
+  justify-content: center; /* Center the header title horizontally */
+  background-color: #ecf0f1; /* Optional background color */
+  padding: 10px 20px;
+  text-decoration: none; 
+  font-family: "Changa", sans-serif;
+  z-index: 1000; /* Ensure it stays on top */
+  font-weight: bold;
+
+}
+.header h1::first-letter {
+  text-transform: capitalize;
+}
+    
+.header h1 {
+  font-size: 35px;
+  font-weight: 200;
+  color: #000000;
+  margin: 0;
+  text-align: center;
+  flex-grow: 1; /* Allow h1 to grow and center itself */
+  margin-top: 1%;
+  margin-left: 7%;
+  text-decoration: none; 
+  font-family: "Changa", sans-serif;
+}
+
+.header a {
+    color: #fff;
+    font-size: 18px;
+    position: relative;
+    margin-top: 1%;
+    text-decoration: none; 
+    font-family: "Changa", sans-serif;
+    
+}
+
+        .header a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            
+            background-color: #fff; /* White glowing separator */
+            left: 0;
+        
+            transition: width 0.3s ease;
+        }
+
+        .header a:hover::after {
+            width: 100%;
+        }
+
+        .about.section {
+            color: #fff;
+            padding: 50px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 100px);
+        }
+
+/* Styling for the Logout Button in the header */
+#logout-link {
+  background: linear-gradient(145deg, #5f92c4, #5f92c4); /* Subtle gradient for 3D effect */
+  color: white; /* Text color */
+  border: 2px solid white; /* White border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px 20px; /* Padding for proper size */
+  text-decoration: none; 
+  font-size: 1.2rem; /* Large font size for visibility */
+  font-weight: bold; /* Bold text for emphasis */
+  cursor: pointer; /* Pointer cursor */
+  text-align: center; /* Center-align text */
+  font-family: "Changa", sans-serif; /* Consistent font */
+  transition: all 0.3s ease; /* Smooth transitions for all properties */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Drop shadow for depth */
+  margin-bottom: 1%;
+}
+
+/* Hover Effect */
+#logout-link:hover {
+  background: linear-gradient(145deg, #ffffff, #ffffff); /* Reverse gradient on hover */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+  transform: translateY(-3px); /* Lift button slightly */
+  text-decoration: none; 
+  color: #000000; /* Slightly lighter text on hover */
+}
+
+/* Active/Clicked Effect */
+#logout-link:active {
+  background: linear-gradient(145deg, #2e2e2e, #4a4a4a);  /* Darker gradient for active state */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Reduced shadow on click */
+  transform: translateY(2px); /* Button presses down slightly */
+  text-decoration: none; 
+}
+
+/* Focused/Focused state */
+#logout-link:focus {
+  outline: none; /* Remove focus outline */
+  border-color: #ff6666; /* Highlight border with a lighter red */
+  text-decoration: none; 
+}
+
+/* Optional: Add an underline animation on hover */
+#logout-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #fff; /* White underline */
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  text-decoration: none; 
+  transition: transform 0.3s ease;
+}
+
+#logout-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+  text-decoration: none; 
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="afterlogin.html"  class="back-button">
+            <i class="bi bi-arrow-left" style="font-size: 30px;"></i>
+        </a>
+        <h1 id="project-name">Project</h1>
+        <a href="#" id="logout-link" class="logout-button">Logout</a>
+
+    </div>
+    <section id="about" class="about section"> 
+      <div class="flip-card-container" style="--hue: 170">
+        <div class="flip-card">
+        
+                <div class="card-front">
+                    <figure>
+                        <div class="img-bg"></div>
+                        <img src="/static/bg2.jpg" alt="">
+                        <figcaption>Manual Tab</figcaption>
+                    </figure>
+        
+                    <!-- <ul>
+                        <li>Detail 1</li>
+                        <li>Detail 2</li>
+                        <li>Detail 3</li>
+                        <li>Detail 4</li>
+                        <li>Detail 5</li>
+                    </ul> -->
+                </div>
+        
+                <div class="card-back">
+                    <figure>
+                        <div class="img-bg"></div>
+                        <img src="/static/bg2.jpg" alt="Brohm Lake">
+                    </figure>
+        
+                    <!-- Updated button with link -->
+                    <a id="manual-link" href="annotation-new_1.html">
+                        <button>View Page</button>
+                    </a>
+        
+                    <div class="design-container">
+                        <span class="design design--1"></span>
+                        <span class="design design--2"></span>
+                        <span class="design design--3"></span>
+                        <span class="design design--4"></span>
+                        <span class="design design--5"></span>
+                        <span class="design design--6"></span>
+                        <span class="design design--7"></span>
+                        <span class="design design--8"></span>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        
+  <!-- /flip-card-container -->
+  
+  <!-- flip-card-container -->
+  <div class="flip-card-container" style="--hue: 170">
+    <div class="flip-card">
+
+        <div class="card-front">
+            <figure>
+                <div class="img-bg"></div>
+                <img src="/static/bg1.jpg" alt="Drone Tab">
+                <figcaption>Drone Tab</figcaption>
+            </figure>
+            <!-- <ul>
+                <li>Detail 1</li>
+                <li>Detail 2</li>
+                <li>Detail 3</li>
+                <li>Detail 4</li>
+                <li>Detail 5</li>
+            </ul> -->
+        </div>
+
+        <div class="card-back">
+            <figure>
+                <div class="img-bg"></div>
+                <img src="/static/bg1.jpg" alt="Drone Tab">
+            </figure>
+
+            <!-- Wrap the button with an anchor tag to enable navigation -->
+            <a id="drone-tab-link" href="drone-tab-new.html">
+                <button>View Page</button>
+            </a>
+
+            <div class="design-container">
+                <span class="design design--1"></span>
+                <span class="design design--2"></span>
+                <span class="design design--3"></span>
+                <span class="design design--4"></span>
+                <span class="design design--5"></span>
+                <span class="design design--6"></span>
+                <span class="design design--7"></span>
+                <span class="design design--8"></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+  <!-- /flip-card-container -->
+  
+  <!-- flip-card-container -->
+  <div class="flip-card-container" style="--hue: 350">
+    <div class="flip-card">
+
+        <div class="card-front">
+            <figure>
+                <div class="img-bg"></div>
+                <img src="/static/bg.jpg" alt="Brohm Lake">
+                <figcaption>Model View</figcaption>
+            </figure>
+
+            <!-- <ul>
+                <li>Detail 1</li>
+                <li>Detail 2</li>
+                <li>Detail 3</li>
+                <li>Detail 4</li>
+                <li>Detail 5</li>
+            </ul> -->
+        </div>
+
+        <div class="card-back">
+            <figure>
+                <div class="img-bg"></div>
+                <img src="/static/bg.jpg" alt="Brohm Lake">
+            </figure>
+
+            <!-- Wrap the button with an anchor tag for the link functionality -->
+            <a id="model-view-link" href="model-view-new.html">
+                <button>View Model</button>
+            </a>
+
+            <div class="design-container">
+                <span class="design design--1"></span>
+                <span class="design design--2"></span>
+                <span class="design design--3"></span>
+                <span class="design design--4"></span>
+                <span class="design design--5"></span>
+                <span class="design design--6"></span>
+                <span class="design design--7"></span>
+                <span class="design design--8"></span>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+</section>
+
+  </div>
+
+  
+  <script>
+    history.pushState(null, null, location.href);
+
+    // Add an event listener for the popstate event
+    window.onpopstate = function(event) {
+        // Show a message to the user
+        alert("You cannot go back to the previous page.");
+        
+        // Push the state again to prevent going back
+        history.pushState(null, null, location.href);
+    };
+
+    // Optional: Prevent back navigation on page unload
+    window.onunload = function() {
+        null;
+    };
+        
+    // Function to get project_id from URL parameters
+    function getProjectId() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id'); // Get the project_id from the URL
+    }
+
+    // Fetch project details and update the page with the project name
+    document.addEventListener('DOMContentLoaded', async function() {
+        const projectId = getProjectId();
+
+        // If projectId exists, fetch project details from the backend
+        if (projectId) {
+            try {
+                const token = localStorage.getItem('token'); // Retrieve token from local storage
+                const response = await fetch(`http://127.0.0.1:5000/project/${projectId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`, // Send token in the Authorization header
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch project details');
+                }
+
+                const projectData = await response.json();
+                console.log(projectData);  // Debug: log the project data
+
+                // Update the project name in the header
+                const projectNameElement = document.getElementById('project-name');
+                projectNameElement.textContent = projectData.name;
+
+                // Update the links with project_id
+                const manualLink = document.getElementById('manual-link');
+                manualLink.href = `annotation-new_1.html?project_id=${projectId}`; 
+
+                const droneTabLink = document.getElementById('drone-tab-link');
+                droneTabLink.href = `drone-tab-new.html?project_id=${projectId}`; 
+
+                const modelViewLink = document.getElementById('model-view-link');
+                modelViewLink.href = `model-view-new.html?project_id=${projectId}`; 
+
+            } catch (error) {
+                console.error('Error fetching project data:', error);
+            }
+        }
+
+        // Logout function
+        const logoutLink = document.getElementById('logout-link');
+        logoutLink.addEventListener('click', async function(event) {
+            event.preventDefault(); // Prevent default behavior
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('http://127.0.0.1:5000/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Logout failed');
+                }
+
+                // Remove token and redirect to login page
+                localStorage.removeItem('token');
+                window.location.href = 'login_new.html';  // Redirect to login page
+
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+    });
+</script>
+</body>
+</html>
+  <!-- /flip-card-container -->
+  

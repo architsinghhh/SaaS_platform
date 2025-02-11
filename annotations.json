@@ -1,0 +1,20 @@
+[
+  {
+    "imageIndex": 0,
+    "annotations": []
+  },
+  {
+    "imageIndex": 1,
+    "annotations": [
+      {
+        "startX": 119,
+        "startY": 156,
+        "width": 675,
+        "height": 246,
+        "class": "Cracks",
+        "severity": "major",
+        "color": "#FF6347"
+      }
+    ]
+  }
+]

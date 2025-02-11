@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(270deg, #001f3f, #0074D9, #7FDBFF, #b2e3e1, #001f3f);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: #fff;
+        }
+
+        @-webkit-keyframes gradientAnimation {
+            0%{background-position:0% 20%}
+            50%{background-position:100% 81%}
+            100%{background-position:0% 20%}
+        }
+        @-moz-keyframes gradientAnimation {
+            0%{background-position:0% 20%}
+            50%{background-position:100% 81%}
+            100%{background-position:0% 20%}
+        }
+        @keyframes gradientAnimation {
+            0%{background-position:0% 20%}
+            50%{background-position:100% 81%}
+            100%{background-position:0% 20%}
+        }
+
+        .header {
+    display: flex;
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Space between items */
+    padding: 20px;
+    background-color: transparent; /* Make navbar transparent */
+    color: #fff;
+    position: relative; /* Position relative for separator */
+}
+
+.back-button {
+    color: #fff; /* Back button color */
+    font-size: 40px;
+    text-decoration: none;
+}
+
+.header h1 {
+    margin: 0; /* Remove margin */
+    font-size: 40px;
+    font-weight: 600;
+    color: #fff; /* Set heading color */
+    text-align: center; /* Center the text */
+    flex-grow: 1; /* Allow the heading to grow and take available space */
+}
+
+.header a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    position: relative;
+    margin-left: 20px; /* Space between heading and logout button */
+}
+
+        .header a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #fff; /* White glowing separator */
+            left: 0;
+            bottom: -3px;
+            transition: width 0.3s ease;
+        }
+
+        .header a:hover::after {
+            width: 100%;
+        }
+
+        .back-button {
+            color: #fff; /* Back button color */
+            font-size: 18px;
+            text-decoration: none;
+            margin-right: 20px; /* Space between back button and heading */
+        }
+
+        .about.section {
+            color: #fff;
+            padding: 50px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 100px);
+        }
+
+        .icon-box {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            width: 200px;
+            height: 200px;
+            transition: transform 0.3s;
+            margin: 10px;
+        }
+
+        .icon-box:hover {
+            transform: translateY(-10px);
+        }
+
+        .icon-box i {
+            font-size: 48px;
+            color: #000080;
+        }
+
+        .icon-box h3 {
+            font-size: 24px;
+            color: #000080;
+            margin: 10px 0;
+        }
+
+        .icon-box p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .read-more {
+            width: 200px;
+            height: 50px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 10px;
+            padding: 5px 20px; /* Reduced padding for smaller button */
+            width: 100%; /* Make button width same as icon box */
+            border-radius: 25px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-align: center;
+            margin-top: 30px; /* Add margin to align with icon box */
+        }
+
+        .read-more:hover {
+            
+            /* height: 70px; */
+            font-size: 15px;
+            background-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+            text-decoration: none;
+        }
+
+        .read-more i {
+            font-size: 20px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="afterlogin.html"  class="back-button">
+            <i class="bi bi-arrow-left" style="font-size: 30px;"></i>
+        </a>
+        <h1 id="project-name">Project</h1>
+        <a href="#" id="logout-link">Logout</a>
+    </div>
+
+    <!-- Section to display project-related links -->
+    <section id="about" class="about section"> 
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="row justify-content-center gy-5">
+                <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-box">
+                        <i class="bi bi-pen"></i>
+                        <h3>Manual</h3>
+                        <p>Manual TAB</p>
+                        <a id="manual-link" href="annotation-new_1.html" class="read-more">
+                            <span>Read More</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon-box">
+                        <i class="bi bi-vr"></i>
+                        <h3>Drone-tab</h3>
+                        <p>Drone TAB</p>
+                        <a id="drone-tab-link" href="drone-tab-new.html" class="read-more">
+                            <span>Read More</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="400">
+                    <div class="icon-box">
+                        <i class="bi bi-box"></i>
+                        <h3>Model view</h3>
+                        <p>MODEL TAB</p>
+                        <a id="model-view-link" href="model-view-new.html" class="read-more">
+                            <span>Read More</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </section>
+
+    <script>
+        history.pushState(null, null, location.href);
+
+        // Add an event listener for the popstate event
+        window.onpopstate = function(event) {
+            // Show a message to the user
+            alert("You cannot go back to the previous page.");
+            
+            // Push the state again to prevent going back
+            history.pushState(null, null, location.href);
+        };
+
+        // Optional: Prevent back navigation on page unload
+        window.onunload = function() {
+            null;
+        };
+            
+        // Function to get project_id from URL parameters
+        function getProjectId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id'); // Get the project_id from the URL
+        }
+
+        // Fetch project details and update the page with the project name
+        document.addEventListener('DOMContentLoaded', async function() {
+            const projectId = getProjectId();
+
+            // If projectId exists, fetch project details from the backend
+            if (projectId) {
+                try {
+                    const token = localStorage.getItem('token'); // Retrieve token from local storage
+                    const response = await fetch(`http://127.0.0.1:5000/project/${projectId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`, // Send token in the Authorization header
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch project details');
+                    }
+
+                    const projectData = await response.json();
+                    console.log(projectData);  // Debug: log the project data
+
+                    // Update the project name in the header
+                    const projectNameElement = document.getElementById('project-name');
+                    projectNameElement.textContent = projectData.name;
+
+                    // Update the links with project_id
+                    const manualLink = document.getElementById('manual-link');
+                    manualLink.href = `annotation-new_1.html?project_id=${projectId}`; 
+
+                    const droneTabLink = document.getElementById('drone-tab-link');
+                    droneTabLink.href = `drone-tab-new.html?project_id=${projectId}`; 
+
+                    const modelViewLink = document.getElementById('model-view-link');
+                    modelViewLink.href = `model-view-new.html?project_id=${projectId}`; 
+
+                } catch (error) {
+                    console.error('Error fetching project data:', error);
+                }
+            }
+
+            // Logout function
+            const logoutLink = document.getElementById('logout-link');
+            logoutLink.addEventListener('click', async function(event) {
+                event.preventDefault(); // Prevent default behavior
+
+                const token = localStorage.getItem('token');
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Logout failed');
+                    }
+
+                    // Remove token and redirect to login page
+                    localStorage.removeItem('token');
+                    window.location.href = 'login_new.html';  // Redirect to login page
+
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

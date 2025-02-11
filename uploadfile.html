@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Project with Images and Model</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            padding: 40px;
+            font-family: "Changa", sans-serif;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            animation: gradientAnimation 15s ease infinite;
+            background: linear-gradient( #ffffff, #8aadd9) !important;
+          }
+
+          button {
+            font-family: "Changa", sans-serif;
+            font-weight: bold;
+            color: #ffffff;
+  
+            letter-spacing: 2px;
+  
+            padding: 9px 20px;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #5f92c4, #5f92c4) !important;
+            transition: .3s;
+  
+            cursor: pointer;
+          }
+  
+          button:hover,
+          button:focus {
+            background: linear-gradient(145deg, #ffffff, #ffffff) !important;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+            color: #000000;
+          }
+  
+          button:active {
+            background: linear-gradient(145deg, #2e2e2e, #4a4a4a);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transform: translateY(2px);
+          }
+  
+    </style>
+</head>
+<body class="bg-gradient-to-r from-purple-400 via-blue-500 to-teal-500 min-h-screen flex justify-center items-center">
+    <div class="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Manually Create a Project</h2>
+        <form id="uploadForm" class="space-y-6">
+            <!-- Username -->
+            <div>
+                <label for="username" class="block text-sm font-semibold text-gray-700">Username</label>
+                <input type="text" id="username" name="username" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            
+            <!-- Password -->
+            <div>
+                <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Project Name -->
+            <div>
+                <label for="project" class="block text-sm font-semibold text-gray-700">Project Name</label>
+                <input type="text" id="project" name="project" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Select Images -->
+            <div>
+                <label for="images" class="block text-sm font-semibold text-gray-700">Select Images</label>
+                <input type="file" id="images" name="images" multiple accept="image/*" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Select Model -->
+            <div>
+                <label for="model" class="block text-sm font-semibold text-gray-700">Select Model File (.glb, .obj, .ply)</label>
+                <input type="file" id="model" name="model" accept=".glb,.obj,.ply" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex items-center justify-between">
+                <button type="submit"
+                    class="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                    Submit
+                </button>
+            </div>
+
+            <!-- Go Home Button -->
+            <div class="flex justify-center">
+                <button type="button" id="goHomeButton"
+                    class="mt-4 w-full py-2 px-4 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300">
+                    <i class="fa fa-home mr-2"></i> Go to Home
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = new FormData();
+            formData.append('username', document.getElementById('username').value);
+            formData.append('password', document.getElementById('password').value);
+            formData.append('project', document.getElementById('project').value);
+
+            // Add selected images
+            const images = document.getElementById('images').files;
+            for (let i = 0; i < images.length; i++) {
+                formData.append('images', images[i]);
+            }
+
+            // Add the selected model file
+            const modelFile = document.getElementById('model').files[0];
+            formData.append('model', modelFile);
+
+            try {
+                // Make the API call to your Flask backend
+                const response = await fetch('http://localhost:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Project and files uploaded successfully!');
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error uploading project:', error);
+                alert('An error occurred while uploading. Please try again.');
+            }
+        });
+
+        document.getElementById('goHomeButton').addEventListener('click', function() {
+            // Redirect to afterlogin.html
+            window.location.href = 'afterlogin.html';
+        });
+    </script>
+</body>
+</html>

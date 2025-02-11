@@ -1,0 +1,339 @@
+<html>
+<head>
+    <title>Welcome Page</title>
+    <style>
+        body {
+            margin: 0;
+            animation: gradientAnimation 15s ease infinite;
+            background: linear-gradient( #ffffff, #8aadd9) !important;
+            background-size: 400% 400%;
+            font-family: "Changa", sans-serif;
+            color: #000000;
+          }
+    
+          @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+    
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 2px;
+            justify-content: space-between;
+            align-items: center;
+            font-family: "Changa", sans-serif;
+            color: rgb(0, 0, 0);
+            font-weight: bold;
+            padding: 10px 20px;
+        }
+    
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            text-align: center;
+            flex-grow: 1;
+
+        }
+    
+        .header a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            font-size: 1rem;
+            margin-top: 10px;
+            position: relative;
+        }
+    
+        .header a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            
+            background-color: #fff; /* White glowing separator */
+            left: 0;
+        
+            transition: width 0.3s ease;
+        }
+    
+        .header h1::first-letter {
+            text-transform: capitalize;
+          }
+    
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+            gap: 15px;
+        
+}
+    
+        .card {
+            margin: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(213, 210, 210, 0.25);
+            border-radius: 8px;
+            width: calc(100% / 2 - 20px); /* Default to two cards per row */
+            max-width: 250px;
+            height: 200px;
+            background-color: #5f92c4; /* New background color for cards */
+            color: #030202; /* Ensures text inside remains visible */
+            background-position: 50%;
+            background-size: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease; /* Smooth transition */
+            text-align: center;
+            padding: 10px;
+            display: flex;
+            justify-content: center; /* Centers horizontally */
+            align-items: center; /* Centers vertically */
+            text-decoration: none;
+            font-size: 50px;
+
+        }
+        
+        .card:hover {
+            background-color: #ecf0f1; /* Change color on hover */
+            font-size: larger;
+            font-weight: bolder;
+            transform: scale(1.05);
+        }
+        
+    
+        .card .title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #000000; /* Change the color to your desired value (e.g., Tomato) */
+            transition: color 0.3s ease; /* Smooth transition for hover effect */
+        }
+        
+        .card:hover .title {
+            color: #000000; /* Optional: Change the title color when the card is hovered over */
+        }
+    
+        #addProjectButton {
+            background: linear-gradient(145deg, #5f92c4, #5f92c4); /* Subtle gradient for 3D effect */
+            color: rgb(255, 255, 255); /* Text color */
+            border: 2px solid white; /* Border for button */
+            border-radius: 8px; /* Rounded corners */
+            padding: 10px 20px; /* Adjust padding for a proper button size */
+            font-size: 1.2rem; /* Slightly larger font size */
+            font-weight: bold; /* Bold text for emphasis */
+            cursor: pointer; /* Pointer cursor */
+            text-align: center; /* Center-align text */
+            font-family: "Changa", sans-serif; /* Custom font */
+            transition: all 0.3s ease; /* Smooth transitions for all properties */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Drop shadow for depth */
+            margin-left: 2%;
+        }
+        
+        #addProjectButton:hover {
+            background: linear-gradient(145deg, #ffffff, #ffffff); /* Reverse gradient for hover effect */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+            transform: translateY(-3px); /* Lift button slightly */
+            color: #000000; /* Slightly lighter text on hover */
+        }
+        
+        #addProjectButton:active {
+            background: linear-gradient(145deg, #2e2e2e, #4a4a4a); /* Darker gradient for active state */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Reduced shadow on click */
+            transform: translateY(2px); /* Button presses down slightly */
+        }
+        
+        #addProjectButton:focus {
+            outline: none; /* Remove focus outline */
+            border-color: #00aaff; /* Highlight border for accessibility */
+        }
+                
+        #logoutButton {
+            background: linear-gradient(145deg, #5f92c4, #5f92c4); /* Red gradient for logout theme */
+            color: white; /* Text color */
+            border: 2px solid white; /* White border */
+            border-radius: 8px; /* Rounded corners */
+            padding: 10px 20px; /* Padding for proper size */
+            font-size: 1.2rem; /* Large font size for visibility */
+            font-weight: bold; /* Bold text for emphasis */
+            cursor: pointer; /* Pointer cursor */
+            text-align: center; /* Center-align text */
+            font-family: "Changa", sans-serif; /* Consistent font */
+            transition: all 0.3s ease; /* Smooth transitions for all properties */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Drop shadow for depth */
+            margin-right: 2%;
+        }
+        
+        #logoutButton:hover {
+            background: linear-gradient(145deg, #ffffff, #ffffff); /* Reverse gradient on hover */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+            transform: translateY(-3px); /* Lift button slightly */
+            color: #000000; /* Slightly lighter text on hover */
+        }
+        
+        #logoutButton:active {
+            background: linear-gradient(145deg, #2e2e2e, #4a4a4a);  /* Darker gradient for active state */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Reduced shadow on click */
+            transform: translateY(2px); /* Button presses down slightly */
+        }
+        
+        #logoutButton:focus {
+            outline: none; /* Remove focus outline */
+            border-color: #ff6666; /* Highlight border with a lighter red */
+        }
+                
+    
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: center;
+            }
+    
+            .header h1 {
+                font-size: 2rem;
+            }
+    
+            .header a {
+                font-size: 1.5rem;
+            }
+    
+            #addProjectButton {
+                width: 100%;
+                max-width: none;
+                padding: 10px;
+            }
+
+            .card {
+                width: 100%; /* Full width for smaller screens */
+                max-width: none;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+    
+            .card {
+                height: 150px;
+            }
+    
+            .card .title {
+                font-size: 0.9rem;
+            }
+    
+            #addProjectButton {
+                font-size: 0.8rem;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            async function fetchWelcomeData() {
+                const token = localStorage.getItem('token'); 
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/welcome', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch welcome data');
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    const welcomeMessage = document.getElementById('welcome-message');
+                    data.username = data.username.charAt(0).toUpperCase() + data.username.slice(1);
+
+                    welcomeMessage.textContent = `Welcome, ${data.username}`;
+
+                    renderProjects(data.projects);
+                } catch (error) {
+                    console.error('Error fetching welcome data:', error);
+                }
+            }
+
+            function renderProjects(projects) {
+                const container = document.querySelector('.container');
+                container.innerHTML = ''; 
+
+                if (projects.length === 0) {
+                    container.innerHTML = '<p>No projects found.</p>';
+                    return;
+                }
+
+                projects.forEach(project => {
+                    const projectCard = document.createElement('a');
+                    projectCard.href = `/afterproject_new.html?id=${project.id}`;
+                    projectCard.className = 'card';
+
+                    const projectTitle = document.createElement('div');
+                    projectTitle.className = 'title';
+                    projectTitle.textContent = project.name;
+
+                    projectCard.appendChild(projectTitle);
+                    container.appendChild(projectCard);
+                });
+            }
+
+            
+            fetchWelcomeData();
+            
+            const addProjectButton = document.getElementById('addProjectButton');
+            addProjectButton.addEventListener('click', function() {
+                window.location.href = 'uploadfile.html';
+            });
+        // Logout function
+        async function logout() {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`, // Send the token in the Authorization header
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Logout failed');
+                }
+
+                // Remove the token from localStorage
+                localStorage.removeItem('token');
+
+                // Redirect to the login page
+                window.location.href = 'login_new.html';  // Change this to your actual login URL
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+
+        // Attach the logout function to the logout link
+        const logoutLink = document.querySelector('.header a[href="/logout"]');
+        logoutLink.addEventListener('click', function(event) {
+            event.preventDefault();  // Prevent the default link behavior
+            logout();  // Call the logout function
+        });
+    });
+    </script>
+</head>
+<body>
+    <div class="header">
+        <button id="addProjectButton">Add Project</button>
+        <h1 id="welcome-message">WELCOME</h1> 
+        <a href="/logout" id="logoutButton">Logout</a>
+    </div>
+    <div class="container">
+        <!-- Projects will be dynamically loaded here -->
+    </div>
+</body>
+</html>

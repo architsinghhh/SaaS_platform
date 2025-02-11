@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Annotation Tool</title>
+    <style>
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          border-right: none;
+          border-bottom: 2px solid #ccc;
+          padding: 10px;
+        }
+        .canvas-container {
+          border-top: none;
+          border-left: 2px solid #ccc;
+        }
+      }
+
+      body {
+        display: flex;
+        height: 90vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f7f9;
+      }
+      .container {
+        display: flex;
+        flex: 1;
+      }
+      .sidebar {
+        width: 250px;
+        overflow-y: auto;
+        background-color: #fff;
+        border-right: 2px solid #ccc;
+        padding: 15px;
+      }
+      .image-list {
+        margin-bottom: 15px;
+      }
+      .image-thumbnail {
+        width: 100%;
+        height: auto;
+        cursor: pointer;
+        margin-bottom: 8px;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        transition: border-color 0.3s ease;
+      }
+      .image-thumbnail:hover {
+        border-color: #007bff;
+      }
+      .image-thumbnail.selected {
+        border-color: blue;
+      }
+      .canvas-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background-color: #eef1f6;
+        border-left: 2px solid #ccc;
+        padding: 10px;
+        margin-top: 20px;
+      }
+      canvas {
+        border: 5px solid #0de96c;
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      #popup {
+        position: absolute;
+        display: none;
+        border: 2px solid #007bff;
+        background-color: white;
+        padding: 10px;
+        z-index: 10;
+        border-radius: 5px;
+        width: 200px; /* Adjust width for better display */
+      }
+      .form-container {
+        padding: 15px;
+        margin-left: 20px;
+        width: 120px;
+        display: flex;
+        flex-direction: column;
+      }
+      .mb-4 {
+        margin-bottom: 16px;
+      }
+      .button-group {
+        margin-top: 10px;
+      }
+      .button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      .navigation-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        justify-content: center;
+        gap: 100px;
+      }
+      .navigation-buttons button {
+        padding: 10px;
+        background-color: #28a745;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+      }
+      .navigation-buttons button:hover {
+        background-color: #218838;
+      }
+      /* Styles for severity radio buttons */
+      .severity-options {
+        margin-top: 10px;
+      }
+      .severity-options input {
+        margin-right: 5px;
+      }
+      /* Styles for the slider */
+      .severity-slider {
+        margin-top: 10px;
+      }
+      .severity-slider input {
+        width: 100%;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body styling */
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      /* Header styling */
+      header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        padding: 10px;
+        z-index: 1000;
+      }
+
+      /* Hamburger menu icon */
+      /* Hamburger menu icon */
+      .menu-icon {
+        width: 40px; /* Increased width */
+        height: 30px; /* Set height to accommodate all lines */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensure even spacing between lines */
+        cursor: pointer;
+        z-index: 9999;
+      }
+
+      .line {
+        width: 100%;
+        height: 4px;
+        background-color: black;
+        margin: 0; /* Remove margin to avoid gaps between lines */
+        transition: all 0.3s ease;
+      }
+
+      /* Navigation bar */
+      nav {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 300px;
+        background-color: rgba(5, 21, 123, 0.5);
+        transform: translateX(100%);
+        transition: transform 0.5s ease;
+        z-index: 9998;
+      }
+
+      nav ul {
+        list-style: none;
+        padding: 50px 20px;
+      }
+
+      nav ul li {
+        margin: 20px 0;
+      }
+
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+
+      nav ul li a:hover {
+        color: lightgray;
+      }
+
+      /* Sections styling */
+      section {
+        padding: 100px 20px;
+        height: 100vh;
+      }
+
+      #home {
+        background-color: lightblue;
+      }
+
+      #services {
+        background-color: lightgreen;
+      }
+
+      /* Active navigation */
+      .nav-visible {
+        transform: translateX(0);
+      }
+      .close-icon {
+        font-size: 30px; /* Size of the close icon */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        margin: 10px; /* Spacing from the edges */
+        color: black; /* Color of the icon */
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="menu-icon" onclick="toggleNav()">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+    </header>
+    <nav id="navbar" class="nav-hidden">
+      <div class="close-icon" onclick="toggleNav()">&times;</div>
+      <!-- Close icon -->
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="drone-tab.html">Drone-tab</a></li>
+        <li><a href="Model-view.html">Model-View</a></li>
+      </ul>
+    </nav>
+    <!-- Hidden navigation bar
+    <nav id="navbar" class="nav-hidden">
+        <ul>
+            <li><a href="#home" onclick="goHome()">Home</a></li>
+            <li><a href="#services">Services</a></li>
+        </ul>
+    </nav>-->
+
+    <!-- Home Section 
+    <section id="home">
+        <h1>Welcome to Home Page</h1>
+    </section>  -->
+
+    <!-- Services Section 
+    <section id="services">
+        <h1>Our Services</h1>
+    </section>-->
+
+    <div class="container">
+      <div class="sidebar">
+        <input type="file" id="imageLoader" multiple />
+        <div class="image-list"></div>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="canvas" width="900" height="500"></canvas>
+        <div id="popup">
+          <!--    <select id="classSelector">
+                  <option value="">Select Class</option>
+                  <option value="Class A">Class A</option>
+                  <option value="Class B">Class B</option>
+                  <option value="Class C">Class C</option>
+                </select>-->
+
+          <!-- class="severity-options Severity radio buttons -->
+          <div id="classSelector">
+            <label
+              ><input type="radio" name="severityType" value="Cracks" />
+              Cracks</label
+            ><br />
+            <label
+              ><input type="radio" name="severityType" value="Seepage" />
+              Seepage</label
+            ><br />
+            <label
+              ><input type="radio" name="severityType" value="Paint" />
+              Paint</label
+            >
+          </div>
+
+          <!-- Severity slider -->
+          <div class="severity-slider">
+            <label for="severityLevel">Severity:</label>
+            <input
+              type="range"
+              id="severityLevel"
+              name="severityLevel"
+              min="1"
+              max="5"
+              value="2"
+            />
+            <span id="severityValue">2</span>
+          </div>
+
+          <!-- Confirm Button -->
+          <button id="confirmButton" class="button">Confirm</button>
+        </div>
+        <!--- <div class="navigation-buttons">
+                <button id="prevButton">Prev</button>
+                <button id="nextButton">Next</button>
+            </div>-->
+
+        <div class="navigation-buttons">
+          <button id="prevButton" aria-label="Previous Slide">
+            <i class="fas fa-arrow-left"></i>
+            <!-- Left arrow icon -->
+          </button>
+          <button id="nextButton" aria-label="Next Slide">
+            <i class="fas fa-arrow-right"></i>
+            <!-- Right arrow icon -->
+          </button>
+        </div>
+
+        <div class="button-group">
+          <!--  <button id="chooseDirButton" class="button">Choose Directory</button>-->
+          <button id="saveAnnotationsButton" class="button">
+            Save Annotations
+          </button>
+          <button id="deleteButton" class="button">Undo</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentSlideIndex = 0; // Initialize the current slide index
+      const totalSlides = document.querySelectorAll(".slide").length; // Count the total number of slides
+
+      // Function to show the current slide based on index
+      function showSlide(index) {
+        // Hide all slides
+        const slides = document.querySelectorAll(".slide");
+        slides.forEach((slide, i) => {
+          slide.style.display = i === index ? "block" : "none"; // Show the current slide
+        });
+      }
+
+      // Event listener for the previous button
+      document.getElementById("prevButton").addEventListener("click", () => {
+        currentSlideIndex--; // Decrease the index
+        if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1; // Loop to the last slide
+        showSlide(currentSlideIndex); // Show the new slide
+      });
+
+      // Event listener for the next button
+      document.getElementById("nextButton").addEventListener("click", () => {
+        currentSlideIndex++; // Increase the index
+        if (currentSlideIndex >= totalSlides) currentSlideIndex = 0; // Loop to the first slide
+        showSlide(currentSlideIndex); // Show the new slide
+      });
+
+      // Keyboard navigation event listener
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+          // Check for left arrow
+          currentSlideIndex--; // Move to previous slide
+          if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1; // Loop to the last slide
+          showSlide(currentSlideIndex); // Show the new slide
+        } else if (event.key === "ArrowRight") {
+          // Check for right arrow
+          currentSlideIndex++; // Move to next slide
+          if (currentSlideIndex >= totalSlides) currentSlideIndex = 0; // Loop to the first slide
+          showSlide(currentSlideIndex); // Show the new slide
+        }
+      });
+
+      // Initially show the first slide
+      showSlide(currentSlideIndex);
+
+      // Function to toggle navigation visibility
+      function toggleNav() {
+        var nav = document.getElementById("navbar");
+        var lines = document.querySelectorAll(".line");
+
+        // Toggle the 'nav-visible' class to open/close the navigation
+        nav.classList.toggle("nav-visible");
+
+        // Update the appearance of the hamburger icon
+        lines.forEach((line) => {
+          if (nav.classList.contains("nav-visible")) {
+            line.classList.add("open"); // Change to X
+          } else {
+            line.classList.remove("open"); // Change back to hamburger
+          }
+        });
+      }
+
+      // Close the navigation bar when clicking outside of it
+      document.addEventListener("click", function (event) {
+        var nav = document.getElementById("navbar");
+        var menuIcon = document.querySelector(".menu-icon");
+        var closeIcon = document.querySelector(".close-icon");
+
+        // Check if click is outside the navigation and menu icon
+        if (
+          !nav.contains(event.target) &&
+          !menuIcon.contains(event.target) &&
+          !closeIcon.contains(event.target)
+        ) {
+          nav.classList.remove("nav-visible"); // Close the navigation
+          var lines = document.querySelectorAll(".line");
+          lines.forEach((line) => line.classList.remove("open")); // Change back to hamburger
+        }
+      });
+
+      // Optional: You can use this function for navigation
+      function goHome() {
+        alert("Navigating to Home!");
+      }
+
+      // Assuming you have a button for the hamburger icon
+      const imageLoader = document.getElementById("imageLoader");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const classSelector = document.getElementById("classSelector");
+      const severitySlider = document.getElementById("severityLevel");
+      const severityValue = document.getElementById("severityValue");
+      const popup = document.getElementById("popup");
+      const confirmButton = document.getElementById("confirmButton");
+      const imageListContainer = document.querySelector(".image-list");
+      const prevButton = document.getElementById("prevButton");
+      const nextButton = document.getElementById("nextButton");
+      const saveAnnotationsButton = document.getElementById(
+        "saveAnnotationsButton"
+      );
+
+      let images = [];
+      let annotations = [];
+      let isDrawing = false;
+      let startX, startY, endX, endY;
+      let currentImageIndex = 0;
+
+      // Define color mapping for each class
+      const colorMapping = {
+        Cracks: "red",
+        Seepage: "green",
+        Paint: "blue",
+      };
+
+      // Display severity value
+      severitySlider.addEventListener("input", () => {
+        severityValue.textContent = severitySlider.value;
+      });
+
+      // Load multiple images on file input change
+      imageLoader.addEventListener("change", (event) => {
+        const files = event.target.files;
+        if (files.length) {
+          images = [];
+          currentImageIndex = 0;
+          annotations = [];
+          imageListContainer.innerHTML = ""; // Clear previous thumbnails
+
+          Array.from(files).forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = new Image();
+              img.src = e.target.result;
+              img.onload = () => {
+                images.push({ image: img, annotations: [] });
+                createThumbnail(img.src); // Create thumbnail for the image
+                if (images.length === 1) drawImageAndAnnotations(); // Draw the first image
+              };
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+      });
+
+      // Create a thumbnail for the image
+      function createThumbnail(src) {
+        const thumbnail = document.createElement("img");
+        thumbnail.src = src;
+        thumbnail.className = "image-thumbnail";
+        thumbnail.onclick = () => {
+          currentImageIndex = images.findIndex((img) => img.image.src === src);
+          drawImageAndAnnotations();
+          updateSelectedThumbnail(thumbnail);
+        };
+        imageListContainer.appendChild(thumbnail);
+      }
+
+      // Update selected thumbnail styling
+      function updateSelectedThumbnail(selectedThumbnail) {
+        const thumbnails = document.querySelectorAll(".image-thumbnail");
+        thumbnails.forEach((thumbnail) => {
+          thumbnail.classList.remove("selected");
+        });
+        selectedThumbnail.classList.add("selected");
+      }
+
+      // Draw image and annotations on canvas
+      function drawImageAndAnnotations() {
+        const currentImage = images[currentImageIndex].image;
+        const currentAnnotations = images[currentImageIndex].annotations;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+        currentAnnotations.forEach((annotation) => {
+          ctx.strokeStyle = annotation.color;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(
+            annotation.startX,
+            annotation.startY,
+            annotation.width,
+            annotation.height
+          );
+
+          // Draw the class name and severity level on top of the annotation
+          ctx.fillStyle = annotation.color;
+          ctx.font = "16px Arial";
+          ctx.fillText(
+            `${annotation.class} (${annotation.severity})`,
+            annotation.startX,
+            annotation.startY - 5
+          );
+        });
+      }
+
+      canvas.addEventListener("mousedown", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        startX = event.clientX - rect.left;
+        startY = event.clientY - rect.top;
+        isDrawing = true;
+      });
+
+      canvas.addEventListener("mousemove", (event) => {
+        if (isDrawing) {
+          const rect = canvas.getBoundingClientRect();
+          endX = event.clientX - rect.left;
+          endY = event.clientY - rect.top;
+          drawImageAndAnnotations();
+          ctx.strokeStyle = "blue";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+        }
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        isDrawing = false;
+
+        // Position the popup closer to the annotation box
+        popup.style.left = `${startX - 50}px`;
+        popup.style.top = `${startY - 50}px`; // Move it above the annotation box
+        popup.style.display = "block"; // Show the popup after drawing the box
+      });
+
+      // Confirm button to finalize annotation
+      confirmButton.addEventListener("click", () => {
+        //const selectedClass = classSelector.value;
+        const selectedClass = document.querySelector(
+          'input[name="severityType"]:checked'
+        )?.value;
+        const severityLevel = severitySlider.value;
+        const selectedColor = colorMapping[selectedClass];
+        const width = endX - startX;
+        const height = endY - startY;
+        if (width > 0 && height > 0) {
+          if (selectedClass && severityLevel) {
+            images[currentImageIndex].annotations.push({
+              startX,
+              startY,
+              width,
+              height,
+              class: selectedClass,
+              severity: severityLevel,
+              color: selectedColor,
+            });
+
+            drawImageAndAnnotations(); // Redraw the image with the new annotation
+            popup.style.display = "none"; // Hide the popup after confirming
+          } else {
+            alert("Please select a class and severity level.");
+          }
+        }
+      });
+
+      prevButton.addEventListener("click", () => {
+        if (currentImageIndex > 0) {
+          currentImageIndex--;
+          drawImageAndAnnotations();
+        }
+      });
+
+      nextButton.addEventListener("click", () => {
+        if (currentImageIndex < images.length - 1) {
+          currentImageIndex++;
+          drawImageAndAnnotations();
+        }
+      });
+      deleteButton.addEventListener("click", () => {
+        if (images[currentImageIndex].annotations.length > 0) {
+          images[currentImageIndex].annotations.pop(); // Remove last annotation
+          drawImageAndAnnotations(); // Redraw without the last annotation
+        }
+      });
+
+      saveAnnotationsButton.addEventListener("click", () => {
+        const annotationsData = images.map((img, index) => ({
+          imageIndex: index,
+          annotations: img.annotations,
+        }));
+        console.log("Annotations:", annotationsData);
+        alert("Annotations saved successfully!");
+      });
+
+      document.addEventListener("click", (event) => {
+        // Get the bounding rectangles of the canvas and popup
+        const canvasRect = canvas.getBoundingClientRect();
+        const popupRect = popup.getBoundingClientRect();
+
+        // Check if the click is outside the canvas and popup
+        const isClickInsideCanvas =
+          event.clientX >= canvasRect.left &&
+          event.clientX <= canvasRect.right &&
+          event.clientY >= canvasRect.top &&
+          event.clientY <= canvasRect.bottom;
+
+        const isClickInsidePopup =
+          event.clientX >= popupRect.left &&
+          event.clientX <= popupRect.right &&
+          event.clientY >= popupRect.top &&
+          event.clientY <= popupRect.bottom;
+
+        if (!isClickInsideCanvas && !isClickInsidePopup) {
+          popup.style.display = "none"; // Hide the popup if click is outside
+        }
+      });
+
+      saveAnnotationsButton.addEventListener("click", async () => {
+        const annotationsData = images.map((imgData, index) => {
+          return {
+            imageIndex: index,
+            annotations: imgData.annotations,
+          };
+        });
+
+        const blob = new Blob([JSON.stringify(annotationsData, null, 2)], {
+          type: "application/json",
+        });
+
+        // Check for File System Access API support
+        if ("showDirectoryPicker" in window) {
+          try {
+            // Open a folder picker
+            const handle = await window.showDirectoryPicker();
+
+            // Create a new file in the selected directory
+            const fileHandle = await handle.getFileHandle("annotations.json", {
+              create: true,
+            });
+
+            // Create a writable stream
+            const writableStream = await fileHandle.createWritable();
+
+            // Write the blob data to the file
+            await writableStream.write(blob);
+
+            // Close the stream
+            await writableStream.close();
+
+            alert("Annotations saved successfully in the selected folder!");
+          } catch (error) {
+            console.error("Error saving annotations:", error);
+          }
+        } else {
+          // Fallback for browsers that don't support the File System Access API
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "annotations.json";
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      });
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get("project_id"); // Get project_id from URL
+      function updateLinks() {
+        if (projectId) {
+          const links = document.querySelectorAll("#navbar a");
+          links.forEach((link) => {
+            const url = new URL(link.href);
+            url.searchParams.set("project_id", projectId); // Append project_id to the URL
+            link.href = url.toString(); // Update the link's href attribute
+          });
+        }
+      }
+      window.onload = updateLinks;
+    </script>
+  </body>
+</html>

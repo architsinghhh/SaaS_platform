@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Annotation Tool</title>
+    
+    <style>
+         @media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #ccc;
+        padding: 10px;
+    }
+    .canvas-container {
+        border-top: none;
+        border-left: 2px solid #ccc;
+    }
+    
+    
+}
+
+
+        body {
+            display: flex;
+            height: 90vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 250px;
+            overflow-y: auto;
+            background-color: #fff;
+            border-right: 2px solid #ccc;
+            padding: 15px;
+        }
+        .image-list {
+            margin-bottom: 15px;
+        }
+        .image-thumbnail {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            margin-bottom: 8px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+            transition: filter 0.3s ease, border-color 0.3s ease;
+
+        }
+        .image-thumbnail:hover {
+            border-color: #007bff;
+        }
+        .image-thumbnail.selected {
+            border-color: blue;
+        }
+        .image-thumbnail.annotated-thumbnail {
+          border: 3px solid orange; /* For images with annotations */
+      }
+      /* Blurred and tick styles for annotated thumbnails */
+      .image-thumbnail.annotated {
+          filter: blur(2px); /* Slight blur effect */
+          position: relative;
+          opacity: 0.8;
+      }
+      
+      /* Green tick overlay */
+      .image-thumbnail.annotated::after {
+          content: "\2713"; /* Unicode for checkmark */
+          color: green;
+          font-size: 24px;
+          font-weight: bold;
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background-color: white;
+          border-radius: 50%;
+          padding: 4px;
+      }
+      
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-color: #eef1f6;
+            border-left: 2px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        canvas {
+            border: 3px solid #000000;
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin: 0;
+            box-sizing: border-box; 
+        }
+        #popup {
+            position: absolute;
+            display: none;
+            border: 2px solid #007bff;
+            background-color: white;
+            padding: 10px;
+            z-index: 10;
+            border-radius: 5px;
+            width: 200px; /* Adjust width for better display */
+        }
+        .form-container {
+            padding: 15px;
+            margin-left: 20px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        .mb-4 {
+            margin-bottom: 16px;
+            margin-top: 50px;
+        }
+        .button-group {
+            margin-top: 10px;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+      
+        /* Styles for the slider */
+        .severity-slider {
+            margin-top: 10px;
+        }
+        .severity-slider input {
+            width: 100%;
+        }
+        
+        #model-buttons {
+            margin-top: 10px; /* Space between model and buttons */
+        }
+
+        #model-buttons button {
+            margin: 5px; /* Space between buttons */
+            padding: 5px 10px; /* Button padding */
+            font-size: 14px; /* Button font size */
+        }
+
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Header styling */
+        header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        /* Hamburger menu icon */
+        /* Hamburger menu icon */
+        .menu-icon {
+            width: 40px; /* Increased width */
+            height: 30px; /* Set height to accommodate all lines */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Ensure even spacing between lines */
+            cursor: pointer;
+            z-index: 9999;
+        }
+        #3d-model-container {
+          position: absolute;
+          top: 100px;
+          right: 10px;
+          width: 600px; /* Increased width */
+          height: 400px; /* Increased height */
+          background-color: #e0e0e0;
+          border-radius: 5px;
+          cursor: grab;
+          overflow: hidden;
+          display: flex;
+          justify-content: center; /* Ensures that the canvas is centered */
+          align-items: center; /* Centers the canvas */
+        }
+                
+        #3d-model-container.grabbing {
+          cursor: grabbing; /* Cursor when dragging */
+        }
+        
+        .line {
+            width: 100%;
+            height: 4px;
+            background-color: black;
+            margin: 0; /* Remove margin to avoid gaps between lines */
+            transition: all 0.3s ease;
+        }
+
+
+        /* Navigation bar */
+        nav {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 300px;
+            background-color: rgba(5, 21, 123, 0.5);
+            transform: translateX(100%);
+            transition: transform 0.5s ease;
+            z-index: 9998;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 50px 20px;
+        }
+
+        nav ul li {
+            margin: 20px 0;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: lightgray;
+        }
+
+        /* Sections styling */
+        section {
+            padding: 100px 20px;
+            height: 100vh;
+        }
+
+        #home {
+            background-color: lightblue;
+        }
+
+        #services {
+            background-color: lightgreen;
+        }
+
+        /* Active navigation */
+        .nav-visible {
+            transform: translateX(0);
+        }
+        .close-icon {
+    font-size: 30px; /* Size of the close icon */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    margin: 10px; /* Spacing from the edges */
+    color: black; /* Color of the icon */
+}
+
+
+
+.navigation-buttons {
+    position: absolute;
+    bottom: -20px; /* Keep buttons at the bottom */
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Center-align buttons */
+    pointer-events: none; /* Ensures only buttons are clickable, not the whole div */
+}
+
+.navigation-buttons button {
+    pointer-events: auto; /* Ensures buttons are clickable */
+    background: none;
+    border: none;
+    font-size: 2.5rem; /* Icon size */
+    color: #444; /* Icon color */
+    transition: transform 0.2s, color 0.2s;
+    cursor: pointer;
+    margin: 0 20px; /* Adjust spacing between buttons */
+}
+
+.navigation-buttons button:hover {
+    transform: scale(1.2); /* Slightly increase size on hover */
+    color: #0073e6; /* Change color on hover */
+}
+
+.navigation-buttons button:active {
+    transform: scale(1); /* Reset to original size on click */
+}
+
+/*@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}*/
+
+#prevButton {
+    animation: bounce 2s infinite;
+}
+
+#nextButton {
+    animation: bounce 2s infinite;
+}
+
+
+.button-group .button {
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+/* Save Annotations Button - Rounded Style */
+#saveAnnotationsButton {
+    background-color: #28a745; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 30px; /* Fully rounded edges */
+    box-shadow: 0px 4px 10px rgba(40, 167, 69, 0.2);
+    margin-right: 15px;
+}
+
+#saveAnnotationsButton:hover {
+    background-color: #218838; /* Darker green on hover */
+    box-shadow: 0px 6px 12px rgba(40, 167, 69, 0.3);
+}
+
+#saveAnnotationsButton:active {
+    background-color: #1e7e34; /* Even darker green on click */
+    transform: scale(0.98);
+}
+
+/* Undo Button - Rectangular Style with Rounded Corners */
+#deleteButton {
+    background-color: #dc3545; /* Red background */
+    color: white;
+    border: none;
+    border-radius: 30px; /* Slightly rounded corners */
+    padding: 10px 25px;
+    box-shadow: 0px 4px 10px rgba(220, 53, 69, 0.2);
+}
+
+#deleteButton:hover {
+    background-color: #c82333; /* Darker red on hover */
+    box-shadow: 0px 6px 12px rgba(220, 53, 69, 0.3);
+}
+
+#deleteButton:active {
+    background-color: #bd2130; /* Even darker red on click */
+    transform: scale(0.98);
+}
+
+.annotated {
+    border: 2px solid orange; /* Set the orange border */
+}
+
+
+.image-thumbnail {
+    border: 2px solid transparent; /* Default border style */
+}
+
+.selected-orange {
+  border: 2px solid orange; /* Highlight for annotated images */
+  filter: blur(2px); 
+}
+.annotated {
+  filter: blur(2px);
+  position: relative;
+}
+
+.annotated .tick-overlay {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  color: white;
+  clip-path: polygon(0 100%, 100% 100%, 100% 0);
+  transform: rotate(45deg);
+}
+
+/* Default tick overlay hidden */
+.tick-overlay {
+  display: none;
+}
+.selected-blue {
+  border: 2px solid blue; /* Highlight for the currently viewed image */
+  filter: blur(2px);
+}
+
+
+    </style>
+</head>
+<body>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  
+  <!-- OrbitControls for 3D model rotation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.min.js"></script>
+  <script type="module">
+      import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+      import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+
+      let object;
+
+      // Define init3DModel in the global scope
+      async function init3DModel(projectId) {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        const modelContainer = document.getElementById("3d-model-container");
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(
+          modelContainer.clientWidth,
+          modelContainer.clientHeight
+        );
+        modelContainer.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(10, 10, 10);
+        scene.add(directionalLight);
+
+        // Fetch the model URL from the backend using project ID
+        const token = localStorage.getItem("token"); // Assuming you stored the token in local storage after login
+
+        try {
+          const response = await fetch(
+            `http://127.0.0.1:5000/get_model/${projectId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to load model");
+          }
+          const modelBlob = await response.blob(); // Make sure this is properly awaited
+          const modelUrl = URL.createObjectURL(modelBlob); // Create a URL for the blob
+
+          // Load the model dynamically from the blob URL
+          const loader = new GLTFLoader();
+          loader.load(
+            modelUrl,
+            function (gltf) {
+              object = gltf.scene;
+              scene.add(object);
+
+              // Center the object
+              const box = new THREE.Box3().setFromObject(object);
+              const center = box.getCenter(new THREE.Vector3());
+              object.position.sub(center);
+            },
+            undefined,
+            function (error) {
+              console.error(
+                "An error occurred while loading the model:",
+                error
+              );
+            }
+          );
+        } catch (error) {
+          console.error("Error fetching model:", error);
+        }
+
+        // Adjust camera position
+        camera.position.set(0, 1, 4);
+        camera.lookAt(0, 0, 0);
+
+        // Controls for camera rotation
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.5;
+        controls.rotateSpeed = 0.5;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.0;
+        controls.minDistance = 1.5;
+        controls.maxDistance = 10;
+
+        // Render the scene
+        function animate() {
+          requestAnimationFrame(animate);
+          if (object) {
+            object.rotation.y += 0.000;
+          }
+          controls.update();
+          renderer.render(scene, camera);
+        }
+
+        animate();
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get("project_id"); // Get project_id from URL
+
+        if (projectId) {
+          console.log("Calling init3DModel with projectId:", projectId);
+          init3DModel(projectId); // Call init3DModel after the DOM is ready
+        } else {
+          console.error("Project ID not found in URL.");
+        }
+      });
+    </script>
+    <header>
+        <div class="menu-icon" onclick="toggleNav()">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </header>
+    <nav id="navbar" class="nav-hidden">
+        <div class="close-icon" onclick="toggleNav()">&times;</div> <!-- Close icon -->
+        <ul>
+            <li><a href="afterlogin.html">Menu</a></li>
+            <li><a href="annotation-new_1.html">Annotation</a></li>
+            <li><a href="model-view-new.html">Model-View</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="sidebar">
+          <button id="refreshButton">Refresh</button>
+            <div class="image-list"></div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="canvas" width="900" height="500"></canvas>
+            <div id="popup">
+            
+              <div id="classSelector">
+                  <div id="classList">
+                      <label>
+                          <input type="radio" name="classType" value="Cracks"> Cracks
+                      </label>
+                      <label>
+                          <input type="radio" name="classType" value="Seepage"> Seepage
+                      </label>
+                      <label>
+                          <input type="radio" name="classType" value="Paint"> Paint
+                      </label>
+                      <label>
+                        <input type="radio" name="classType" value="Paint"> Leakage
+                    </label>
+                  </div>
+                  <button id="addClassButton">+</button>
+              </div>
+
+              <!-- Severity slider -->
+              <div class="severity-checkboxes">
+                <label for="severityLevel">Major Defect</label>
+                <input type="checkbox" id="severityLevel" name="defectLevel" value="major">
+            
+                <label for="severityLevelMinor">Minor Defect</label>
+                <input type="checkbox" id="severityLevelMinor" name="defectLevel" value="minor">
+            </div>
+
+              
+              <button id="confirmButton">Confirm Annotation</button>
+              
+
+          </div>
+            <div class="navigation-buttons">
+                <button id="prevButton" aria-label="Previous Slide">
+                    <i class="fas fa-chevron-circle-left"></i> <!-- Left arrow icon -->
+                </button>
+                <button id="nextButton" aria-label="Next Slide">
+                    <i class="fas fa-chevron-circle-right"></i> <!-- Right arrow icon -->
+                </button>
+            </div>
+          
+          
+         
+        </div>
+    </div>
+
+    <div class="w-1/5 pl-4"> <!-- Adjusted width to w-1/5 -->
+        <!-- 3D Model Section replacing the image -->
+        <div class="mb-4">
+            <div id="3d-model-container" class="relative w-full" style="height: 150px; background-color: #e0e0e0;">
+                <!-- 3D Model rendered here -->
+                <div id="model" class="absolute top-0 right-0 w-1 h-1"></div> <!-- Changed w-3/4 to w-full -->
+            </div>
+        </div>
+        <div class="button-group">
+         <!--  <button id="chooseDirButton" class="button">Choose Directory</button> --> 
+            <button id="saveAnnotationsButton" class="button">Save Annotations</button><br>
+            <button id="deleteButton" class="button">Undo</button>
+        </div>
+    </div>
+    
+  
+    
+    <script>
+        let currentSlideIndex = 0; // Initialize the current slide index
+        const totalSlides = document.querySelectorAll(".slide").length; // Count the total number of slides
+  
+        // Function to show the current slide based on index
+        function showSlide(index) {
+          // Hide all slides
+          const slides = document.querySelectorAll(".slide");
+          slides.forEach((slide, i) => {
+            slide.style.display = i === index ? "block" : "none"; // Show the current slide
+          });
+        }
+  
+        // Event listener for the previous button
+        document.getElementById("prevButton").addEventListener("click", () => {
+          currentSlideIndex--; // Decrease the index
+          if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1; // Loop to the last slide
+          showSlide(currentSlideIndex); // Show the new slide
+        });
+  
+        // Event listener for the next button
+        document.getElementById("nextButton").addEventListener("click", () => {
+          currentSlideIndex++; // Increase the index
+          if (currentSlideIndex >= totalSlides) currentSlideIndex = 0; // Loop to the first slide
+          showSlide(currentSlideIndex); // Show the new slide
+        });
+  
+        // Keyboard navigation event listener
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "ArrowLeft") {
+            // Check for left arrow
+            currentSlideIndex--; // Move to previous slide
+            if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1; // Loop to the last slide
+            showSlide(currentSlideIndex); // Show the new slide
+          } else if (event.key === "ArrowRight") {
+            // Check for right arrow
+            currentSlideIndex++; // Move to next slide
+            if (currentSlideIndex >= totalSlides) currentSlideIndex = 0; // Loop to the first slide
+            showSlide(currentSlideIndex); // Show the new slide
+          }
+        });
+  
+        // Initially show the first slide
+        showSlide(currentSlideIndex);
+  
+        // Function to toggle navigation visibility
+        function toggleNav() {
+          var nav = document.getElementById("navbar");
+          var lines = document.querySelectorAll(".line");
+  
+          // Toggle the 'nav-visible' class to open/close the navigation
+          nav.classList.toggle("nav-visible");
+  
+          // Update the appearance of the hamburger icon
+          lines.forEach((line) => {
+            if (nav.classList.contains("nav-visible")) {
+              line.classList.add("open"); // Change to X
+            } else {
+              line.classList.remove("open"); // Change back to hamburger
+            }
+          });
+        }
+  
+        // Close the navigation bar when clicking outside of it
+        document.addEventListener("click", function (event) {
+          var nav = document.getElementById("navbar");
+          var menuIcon = document.querySelector(".menu-icon");
+          var closeIcon = document.querySelector(".close-icon");
+  
+          // Check if click is outside the navigation and menu icon
+          if (
+            !nav.contains(event.target) &&
+            !menuIcon.contains(event.target) &&
+            !closeIcon.contains(event.target)
+          ) {
+            nav.classList.remove("nav-visible"); // Close the navigation
+            var lines = document.querySelectorAll(".line");
+            lines.forEach((line) => line.classList.remove("open")); // Change back to hamburger
+          }
+        });
+  
+        function updateImage(index) {
+          // Logic to update the displayed image based on the index
+          currentImageIndex = index;
+      
+          // Check if the current image is the last one
+          if (currentImageIndex === images.length - 1) {
+              document.getElementById('finishButton').style.display = 'inline-block'; // Show Finish button
+          } else {
+              document.getElementById('finishButton').style.display = 'none'; // Hide Finish button
+          }
+      }
+      
+      // Event listener for the Finish button
+      document.getElementById('finishButton').addEventListener('click', function() {
+          document.getElementById('commentBox').style.display = 'block'; // Show comment box
+      });
+      
+      // Event listener for the Submit button in the comment box
+      document.getElementById('submitCommentButton').addEventListener('click', function() {
+          const comment = document.getElementById('commentText').value;
+      
+          // Logic to save annotations and the comment
+          saveAnnotations(comment);
+      
+          // Hide the comment box after submission
+          document.getElementById('commentBox').style.display = 'none';
+          document.getElementById('finishButton').style.display = 'none'; // Optionally hide the finish button
+      });
+      
+      // Example function to save annotations
+      function saveAnnotations(startX, startY, width, height, className, severity, color) {
+        // Get the current image object
+        const currentImage = images[currentImageIndex];
+    
+        // Ensure the annotations array exists
+        if (!currentImage.annotations) {
+            currentImage.annotations = []; // Initialize if it doesn't exist
+        }
+    
+        // Get the file name from the current image
+        const fileName = currentImage.fileName; // Assuming currentImage has a fileName property
+    
+        // Calculate the right and bottom coordinates
+        const right = startX + width;
+        const bottom = startY + height;
+    
+        // Create a new annotation object with the file name and other details
+        const newAnnotation = {
+            fileName: fileName, // Add the file name
+            startX: startX, // Use the dynamic value
+            startY: startY, // Use the dynamic value
+            right: right, // Calculated right value
+            bottom: bottom, // Calculated bottom value
+            class: className, // Use the dynamic value
+            severity: severity, // Use the dynamic value
+            color: color // Use the dynamic value
+        };
+    
+        // Push the new annotation to the current image's annotations array
+        currentImage.annotations.push(newAnnotation);
+    
+        // Log the saved annotations for debugging
+        console.log("New annotation saved:", newAnnotation);
+        console.log("Updated annotations for", fileName, ":", currentImage.annotations);
+    
+        // Add the annotation to annotationsData by filename
+        if (!annotationsData[fileName]) {
+            annotationsData[fileName] = []; // Initialize if not already there
+        }
+        annotationsData[fileName].push(newAnnotation);
+    
+        // Log the updated annotationsData for debugging
+        console.log("Annotations data:", annotationsData);
+    }
+    
+
+        // Optional: You can use this function for navigation
+        function goHome() {
+          alert("Navigating to Home!");
+        }
+
+  </script>
+  
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const severitySlider = document.getElementById("severityLevel");
+    const severityValue = document.getElementById("severityValue");
+    const popup = document.getElementById("popup");
+    const confirmButton = document.getElementById("confirmButton");
+    
+    const imageListContainer = document.querySelector(".image-list");
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+    const saveAnnotationsButton = document.getElementById("saveAnnotationsButton");
+    const deleteButton = document.getElementById("deleteButton");
+
+    let images = [];
+    let isDrawing = false;
+    let startX, startY, endX, endY;
+    let currentImageIndex = 0;
+
+   
+
+    // Display severity value
+    severitySlider.addEventListener("input", () => {
+      severityValue.textContent = severitySlider.value;
+    });
+
+    // Load static images into the image array
+    async function loadImages(projectId) {
+      const token = localStorage.getItem("token"); // Assuming you stored the token in local storage after login
+
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/projects/${projectId}/images`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load images");
+        }
+
+        const data = await response.json();
+        console.log(data);
+        // Assuming the data structure is { images: [{ id, url, filename }, ...] }
+        if (Array.isArray(data)) {
+          for (const img of data) {
+            const imgElement = new Image();
+            imgElement.src = img.url; // Use the URL returned by the backend
+
+            imgElement.onload = () => {
+              images.push({ image: imgElement, annotations: [] });
+              console.log("Image loaded:", imgElement.src); // Log loaded image
+              createThumbnail(img.url); // Create thumbnail for the image
+              if (images.length === 1) drawImageAndAnnotations(); // Draw the first image
+          };
+
+            imgElement.onerror = () => {
+              console.error(`Error loading image: ${img.url}`); // Log the error
+            };
+
+            console.log(`Loading image from: ${img.url}`);
+          }
+        } else {
+          console.error("Expected an array of images but got:", data);
+        }
+      } catch (error) {
+        console.error("Error loading images:", error);
+      }
+    }
+
+    function updateThumbnailHighlighting() {
+      const thumbnails = document.querySelectorAll('.image-thumbnail');
+      thumbnails.forEach((thumbnail, index) => {
+          thumbnail.classList.remove('selected-orange', 'selected-blue'); // Remove all previous highlights
+  
+          if (index === currentImageIndex) {
+              // If the thumbnail is the current image, apply the blue highlight
+              thumbnail.classList.add('selected-blue');
+          } else if (images[index].annotations.length > 0) {
+              // If it has annotations and is not the selected image, apply the orange highlight
+              thumbnail.classList.add('selected-orange');
+          }
+      });
+  }
+  
+
+    // Create a thumbnail for the image
+    function createThumbnail(src) {
+      const thumbnail = document.createElement('img');
+      thumbnail.src = src;
+      thumbnail.className = 'image-thumbnail'; // Ensure this class matches your CSS
+  
+      thumbnail.onclick = () => {
+          currentImageIndex = images.findIndex(img => img.image.src === src);
+          drawImageAndAnnotations();
+          updateThumbnailHighlighting(); // Update highlighting based on the clicked thumbnail
+      };
+  
+      imageListContainer.appendChild(thumbnail); // Append the thumbnail to the container
+  }
+  
+
+  function selectImage(index) {
+    // Remove blue border from previously selected image
+    if (selectedImageIndex !== null) {
+        const prevSelected = document.querySelector(`.thumbnail[data-index='${selectedImageIndex}']`);
+        prevSelected.classList.remove('selected-blue');
+    }
+
+    // Add blue border to the new selected image
+    const currentSelected = document.querySelector(`.thumbnail[data-index='${index}']`);
+    currentSelected.classList.add('selected-blue');
+    selectedImageIndex = index;
+}
+
+// Function to annotate the selected image
+function annotateImage() {
+    if (selectedImageIndex !== null) {
+        const annotatedImage = images[selectedImageIndex];
+        annotatedImage.annotated = true;
+
+        // Add blur and tick overlay to the thumbnail
+        const thumbnailContainer = document.querySelector(`.thumbnail[data-index='${selectedImageIndex}']`).parentElement;
+        thumbnailContainer.classList.add('annotated');
+
+        // Add tick overlay
+        const tickOverlay = document.createElement('div');
+        tickOverlay.classList.add('tick-overlay');
+        thumbnailContainer.appendChild(tickOverlay);
+    }
+}
+
+
+    // Update selected thumbnail styling
+    function updateSelectedThumbnail(selectedThumbnail) {
+      const thumbnails = document.querySelectorAll(".image-thumbnail");
+      thumbnails.forEach((thumbnail) => {
+        thumbnail.classList.remove("selected");
+      });
+      selectedThumbnail.classList.add("selected");
+    }
+
+    function refreshImages() {
+      // Save the current image index to navigate properly
+      const currentImageSrc = images[currentImageIndex]?.image.src;
+  
+      // Sort images: unprocessed (no annotations) first
+      images.sort((a, b) => {
+          const aProcessed = a.annotations.length > 0;
+          const bProcessed = b.annotations.length > 0;
+          return (aProcessed === bProcessed) ? 0 : aProcessed ? 1 : -1;
+      });
+  
+      // Find the first unannotated image, if any
+      const firstUnannotatedImage = images.find(img => img.annotations.length === 0);
+      
+      // Reset to the first unannotated image if exists, otherwise to the first image
+      if (firstUnannotatedImage) {
+          currentImageIndex = images.indexOf(firstUnannotatedImage); // Set to the first unannotated image
+      } else {
+          currentImageIndex = 0; // If no unannotated image, reset to the first image
+      }
+  
+      // Draw the current image and its annotations
+      drawImageAndAnnotations();
+  
+      // Log to see what happened
+      console.log("Current image index after refresh:", currentImageIndex);
+  
+      // Reset the image list container and recreate thumbnails
+      imageListContainer.innerHTML = ''; // Clear current thumbnails
+  
+      // Recreate thumbnails based on the updated image order
+      images.forEach((img, index) => {
+          createThumbnail(img.image.src); // Recreate the thumbnail
+      });
+  
+      // Reapply highlighting to thumbnails based on annotations
+      updateThumbnailHighlighting();
+  }
+  
+  refreshButton.addEventListener('click', () => {
+      // Log the order of images before refresh
+      console.log("Before refresh:", images.map(img => img.image.src));
+  
+      // Call refreshImages to handle sorting and display
+      refreshImages();
+  });
+  
+  let refreshClicked = false; // Flag to track if refresh button has been clicked
+
+function renderSidebarImages() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.innerHTML = ''; // Clear existing thumbnails
+
+    let sortedImages;
+
+    // Check if refresh button was clicked to apply sorting
+    if (refreshClicked) {
+        // Sort images: non-annotated images first
+        sortedImages = images.slice().sort((a, b) => a.annotations.length - b.annotations.length);
+    } else {
+        // If not sorted, use the original order
+        sortedImages = images;
+    }
+
+    // Display sorted images in the sidebar
+    sortedImages.forEach((imgObj, index) => {
+        const thumbnailCanvas = document.createElement('canvas');
+        thumbnailCanvas.className = 'thumbnail';
+        thumbnailCanvas.width = 100; // Set width for the thumbnail
+        thumbnailCanvas.height = 100; // Set height for the thumbnail
+
+        // Draw the thumbnail with blur effect and tick if it has annotations
+        drawThumbnail(imgObj.image, imgObj.annotations.length > 0, thumbnailCanvas);
+
+        // Set up click event for each thumbnail to display it in the main frame
+        thumbnailCanvas.onclick = () => {
+            currentImageIndex = images.indexOf(imgObj);
+            drawImageAndAnnotations();
+            updateThumbnailHighlighting();
+        };
+
+        // Append the canvas to the sidebar
+        sidebar.appendChild(thumbnailCanvas);
+    });
+
+    // Update the main frame to show the first unannotated image (or the first image) after refresh
+    if (refreshClicked) {
+        const firstUnannotatedIndex = sortedImages.findIndex(img => img.annotations.length === 0);
+        currentImageIndex = firstUnannotatedIndex >= 0 ? firstUnannotatedIndex : 0;
+        drawImageAndAnnotations();
+        updateThumbnailHighlighting();
+    }
+}
+
+// Event listener for the refresh button to trigger sorting and render
+document.getElementById('refreshButton').addEventListener('click', () => {
+    refreshClicked = true; // Set the flag to true when refresh is clicked
+    renderSidebarImages();  // Sort and render images
+});
+
+
+
+    // Draw image and annotations on canvas
+  
+
+    // Function to draw the image and annotations
+    function drawImageAndAnnotations() {
+      const currentImage = images[currentImageIndex].image;
+      const currentAnnotations = images[currentImageIndex].annotations;
+  
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+      
+      currentAnnotations.forEach(annotation => {
+          ctx.strokeStyle = annotation.color;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(annotation.startX, annotation.startY, annotation.width, annotation.height);
+  
+          // Conditionally include severity only if it has a value
+          const labelText = annotation.severity 
+              ? `${annotation.class} (${annotation.severity})` 
+              : `${annotation.class}`;
+  
+          // Draw the class name (and severity level if it exists) on top of the annotation
+          ctx.fillStyle = annotation.color;
+          ctx.font = '16px Arial';
+          ctx.fillText(labelText, annotation.startX, annotation.startY - 5);
+      });
+  
+      // Ensure the canvas container always has the highlighting color
+      document.querySelector('.canvas-container').style.borderColor = 'blue';
+  }
+  
+  const predefinedColors = [
+    "#FF5733", // Bright Orange
+    "#33FF57", // Bright Green
+    "#3357FF", // Bright Blue
+    "#FF33A6", // Vibrant Pink
+    "#FFBD33", // Golden Yellow
+    "#33FFF1", // Aqua
+    "#FF33D1", // Hot Pink
+    "#FF8C33", // Bright Coral
+    "#7D33FF", // Purple
+    "#33FF8C", // Lime Green
+    "#8C33FF", // Violet
+    "#FF5733", // Bold Red-Orange
+    "#33A6FF", // Sky Blue
+    "#A6FF33", // Neon Yellow-Green
+    "#FF33B5"  // Magenta
+];
+
+// Mapping of predefined classes to their distinct colors (now different from the predefined set)
+const colorMapping = {
+    "Cracks": "#FF6347", // Tomato Red
+    "Seepage": "#32CD32", // Lime Green
+    "Paint": "#1E90FF", // Dodger Blue
+    "Leakage": "#FFD700" // Gold
+};
+
+        
+
+        // Index to keep track of the next color to use
+        let colorIndex = 0;
+
+
+
+// Event listener for adding a new class
+addClassButton.addEventListener('click', () => {
+    const className = prompt("Enter the name of the custom class:");
+
+    if (className) {
+        // Check if the class already exists in the mapping
+        if (!colorMapping[className]) {
+            // Assign the next color from the predefined list
+            colorMapping[className] = predefinedColors[colorIndex];
+
+            // Update colorIndex to use the next color in the list
+            colorIndex = (colorIndex + 1) % predefinedColors.length;
+
+            // Create a new radio button for the custom class
+            const newClassLabel = document.createElement('label');
+            const newClassInput = document.createElement('input');
+            newClassInput.type = 'radio';
+            newClassInput.name = 'classType';
+            newClassInput.value = className;
+
+            // Apply the color from the mapping to the label text
+            newClassLabel.style.color = colorMapping[className];
+            newClassLabel.appendChild(newClassInput);
+            newClassLabel.appendChild(document.createTextNode(className));
+
+            // Append the new class label to the class list
+            classList.appendChild(newClassLabel);
+
+            // Notify the user
+            alert(`Custom class "${className}" added with color ${colorMapping[className]}.`);
+        } else {
+            alert(`Class "${className}" already exists.`);
+        }
+    } else {
+        alert("Class name is required.");
+    }
+});
+  
+  // Mouse event listeners to capture rectangle area
+  canvas.addEventListener('mousedown', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    startX = event.clientX - rect.left;
+    startY = event.clientY - rect.top;
+    isDrawing = true;
+});
+
+canvas.addEventListener('mousemove', (event) => {
+    if (isDrawing) {
+        const rect = canvas.getBoundingClientRect();
+        endX = event.clientX - rect.left;
+        endY = event.clientY - rect.top;
+        drawImageAndAnnotations();
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+    }
+});
+
+canvas.addEventListener('mouseup', () => {
+  isDrawing = false;
+
+  // Set the popup to a fixed position
+  popup.style.right = '-250px'; // Set to desired fixed position from the left
+  popup.style.top = '360px';  // Set to desired fixed position from the top
+  popup.style.display = 'block'; // Show the popup after drawing the box
+});
+
+// Function to confirm annotation
+document.getElementById('confirmButton').addEventListener('click', function() {
+  // Your existing logic for confirming the annotation...
+
+  // Hide the popup after confirming
+  popup.style.display = 'none'; // Hide the popup
+});
+
+  
+if (!confirmButton) console.error("Confirm button not found!");
+
+confirmButton.addEventListener("click", () => {
+  console.log("Confirm button clicked.");
+
+  // Get the selected class type
+  const selectedClass = document.querySelector('input[name="classType"]:checked');
+  if (!selectedClass) {
+      alert("Please select a class.");
+      console.warn("No class selected.");
+      return;
+  }
+
+  const selectedClassName = selectedClass.value;
+  console.log("Selected class:", selectedClassName);
+
+  // Determine severity level based on checkbox selection
+  const isMajorDefect = document.getElementById("severityLevel").checked;
+  const isMinorDefect = document.getElementById("severityLevelMinor").checked;
+
+  let severityLevel;
+  if (isMajorDefect && isMinorDefect) {
+      alert("Please select only one defect level (either Major or Minor).");
+      console.warn("Both checkboxes selected.");
+      return;
+  } else if (isMajorDefect) {
+      severityLevel = "major";
+  } else if (isMinorDefect) {
+      severityLevel = "minor";
+  } else {
+      alert("Please select a defect level.");
+      console.warn("No defect level selected.");
+      return;
+  }
+
+  console.log("Severity level:", severityLevel);
+
+  // Ensure startX, startY, endX, and endY are defined
+  // (assuming these values are already set earlier in your code)
+  if (typeof startX === "undefined" || typeof startY === "undefined" || 
+      typeof endX === "undefined" || typeof endY === "undefined") {
+      console.error("Coordinates are not defined.");
+      return;
+  }
+
+  // Construct annotation object
+  const annotation = {
+      startX: startX,
+      startY: startY,
+      width: endX - startX,
+      height: endY - startY,
+      class: selectedClassName,
+      severity: severityLevel,
+      color: colorMapping[selectedClassName] || "black"
+  };
+
+  console.log("Annotation created:", annotation);
+
+  // Assuming `images[currentImageIndex].annotations.push(annotation);` is used to save annotations
+  images[currentImageIndex].annotations.push(annotation);
+  drawImageAndAnnotations();  // Redraw canvas with new annotation
+});
+
+
+    // Inside your event listener for previous button
+prevButton.addEventListener('click', () => {
+  // Move to the previous image and loop back to the last if at the start
+  if (currentImageIndex === 0) {
+      currentImageIndex = images.length - 1; // Loop to the last image
+  } else {
+      currentImageIndex--; // Move to the previous image
+  }
+  drawImageAndAnnotations(); // Redraw the image based on the new index
+  updateThumbnailHighlighting(); // Update thumbnails if needed
+});
+
+// Inside your event listener for next button
+nextButton.addEventListener('click', () => {
+  // Move to the next image and loop back to the first if at the end
+  if (currentImageIndex === images.length - 1) {
+      currentImageIndex = 0; // Loop to the first image
+  } else {
+      currentImageIndex++; // Move to the next image
+  }
+  drawImageAndAnnotations(); // Redraw the image based on the new index
+  updateThumbnailHighlighting(); // Update thumbnails if needed
+});
+
+
+    // Delete last annotation
+    deleteButton.addEventListener("click", () => {
+      if (images[currentImageIndex].annotations.length > 0) {
+        images[currentImageIndex].annotations.pop();
+        drawImageAndAnnotations();
+      }
+    });
+
+    // Save annotations button
+    saveAnnotationsButton.addEventListener('click', async () => {
+      // Step 1: Prompt the user for a comment
+      const comment = prompt("Please enter a comment for the annotations:");
+  
+      if (!comment) {
+          alert("Comment is required to save annotations.");
+          return; // If no comment is entered, stop the process
+      }
+  
+      // Step 2: Create annotations data with the comment
+      const annotationsData = images.map((imgData, index) => {
+          return {
+              imageIndex: index,
+              annotations: imgData.annotations,
+              comment: comment // Add comment to each annotation
+          };
+      });
+  
+      const blob = new Blob([JSON.stringify(annotationsData, null, 2)], { type: "application/json" });
+  
+      // Step 3: Check for File System Access API support and save locally
+      if ('showDirectoryPicker' in window) {
+          try {
+              // Open a folder picker
+              const handle = await window.showDirectoryPicker();
+              
+              // Create a new file in the selected directory
+              const fileHandle = await handle.getFileHandle('annotations.json', { create: true });
+              
+              // Create a writable stream
+              const writableStream = await fileHandle.createWritable();
+              
+              // Write the blob data to the file
+              await writableStream.write(blob);
+              
+              // Close the stream
+              await writableStream.close();
+              
+              alert('Annotations saved successfully in the selected folder!');
+          } catch (error) {
+              console.error('Error saving annotations:', error);
+          }
+      } else {
+          // Fallback for browsers that don't support the File System Access API
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'annotations.json';
+          a.click();
+          URL.revokeObjectURL(url);
+      }
+  
+      // Step 4: Send the annotations and comment to the server
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get('project_id');
+  
+      if (!projectId) {
+          alert("Project ID not found in URL");
+          return;
+      }
+  
+      try {
+          const response = await fetch("http://127.0.0.1:5000/save_annotations", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${localStorage.getItem('token')}`
+              },
+              body: JSON.stringify({
+                  project_id: projectId,
+                  annotations: annotationsData
+              })
+          });
+  
+          const result = await response.json();
+          if (response.ok) {
+              alert(result.message);
+          } else {
+              console.error(result.message);
+          }
+      } catch (error) {
+          console.error("Error saving annotations:", error);
+      }
+  });
+  
+    // Fetch project_id from URL and load images
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get("project_id"); // Get project_id from URL
+    if (projectId) {
+      loadImages(projectId); // Load images using project_id
+    } else {
+      console.error("Project ID not found in URL.");
+    }
+    function updateLinks() {
+        if (projectId) {
+          const links = document.querySelectorAll("#navbar a");
+          links.forEach((link, index) => {
+            // Skip the first link (index 0)
+            if (index !== 0) {
+              const url = new URL(link.href);
+              url.searchParams.set("project_id", projectId); // Append project_id to the URL
+              link.href = url.toString(); // Update the link's href attribute
+            }
+          });
+        }
+      }
+      
+      window.onload = updateLinks;
+  </script>
+</body>
+</html>

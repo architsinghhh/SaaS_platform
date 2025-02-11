@@ -1,0 +1,337 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,600,700");
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.container {
+  height: 200vh;
+  background-image: url(/static/login.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.modal {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(51, 51, 51, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: 0.4s;
+}
+.modal-container {
+  display: flex;
+  max-width: 720px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  transition-duration: 0.3s;
+  background: #fff;
+  transform: translateY(100px) scale(0.4);
+}
+.modal-title {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 400;
+  color: #040201;
+  font-family: "Changa", sans-serif;
+
+}
+.modal-desc {
+  margin: 6px 0 30px 0;
+  font-size: 28px; /* Adjust font size as needed */
+  font-weight: bold;
+  font-family: "Changa", sans-serif;
+
+}
+
+.ajn-text {
+  color: #2857a7;
+}
+
+.ajn-color {
+  color: rgba(40, 87, 167, 1); /* rgba equivalent for AJN */
+}
+
+.hawk-text {
+  color: #151632;
+}
+
+.hawk-color {
+  color: rgba(21, 22, 50, 1); /* rgba equivalent for HAWK */
+}
+
+.modal-left {
+  padding: 60px 30px 20px;
+  background: #fff;
+  flex: 1.5;
+  transition-duration: 0.5s;
+  transform: translateY(80px);
+  opacity: 0;
+}
+.modal-button {
+  color: #7d695e;
+  font-family: "Changa", sans-serif;
+  font-size: 30px;
+  cursor: pointer;
+  border: 0;
+  outline: 0;
+  padding: 10px 40px;
+  border-radius: 30px;
+  background: white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.16);
+  transition: 0.3s;
+}
+.modal-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+}
+.modal-right {
+  flex: 2;
+  font-size: 0;
+  transition: 0.3s;
+  overflow: hidden;
+}
+.modal-right img {
+  width: 100%;
+  height: 100%;
+  transform: scale(2);
+  -o-object-fit: cover;
+     object-fit: cover;
+  transition-duration: 1.2s;
+}
+.modal.is-open {
+  height: 100%;
+  background: rgba(51, 51, 51, 0.85);
+}
+.modal.is-open .modal-button {
+  opacity: 0;
+}
+.modal.is-open .modal-container {
+  opacity: 1;
+  transition-duration: 0.6s;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.modal.is-open .modal-right img {
+  transform: scale(1);
+}
+.modal.is-open .modal-left {
+  transform: translateY(0);
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-buttons a {
+  color: rgba(51, 51, 51, 0.6);
+  font-size: 14px;
+}
+
+.sign-up {
+  margin: 60px 0 0;
+  font-size: 14px;
+  text-align: center;
+}
+.sign-up a {
+  color: #8c7569;
+}
+
+.input-button {
+  padding: 8px 12px;
+  outline: none;
+  border: 0;
+  color: #fff;
+  border-radius: 4px;
+  background: #8c7569;
+  font-family: "Nunito", sans-serif;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.input-button:hover {
+  background: #55311c;
+}
+
+.input-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  color: #8c7569;
+  transition: 0.3s;
+}
+
+.input-block {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  transition: 0.3s;
+  font-family: "Changa", sans-serif;
+
+}
+.input-block input {
+  outline: 0;
+  border: 0;
+  padding: 4px 0 0;
+  font-size: 14px;
+  font-family: "Changa", sans-serif;
+
+}
+.input-block input::-moz-placeholder {
+  color: #ccc;
+  opacity: 1;
+}
+.input-block input:-ms-input-placeholder {
+  color: #ccc;
+  opacity: 1;
+}
+.input-block input::placeholder {
+  color: #ccc;
+  opacity: 1;
+}
+.input-block:focus-within {
+  border-color: #8c7569;
+}
+.input-block:focus-within .input-label {
+  color: rgba(140, 117, 105, 0.8);
+}
+
+.icon-button {
+  outline: 0;
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  width: 0px;
+  height: 32px;
+  border: 0;
+  background: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Basic styling for the scroll-down div */
+.scroll-down {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed; /* Make it fixed so it stays on the screen */
+  bottom: 400px; /* Position it at the bottom of the viewport */
+  left: 50%;
+  transform: translateX(-50%); /* Center the arrow horizontally */
+  z-index: 999; /* Ensure it stays above other content */
+
+}
+
+/* Styling for the SVG arrow */
+.scroll-down svg {
+  width: 50px;
+  height: 50px;
+
+  fill: #fff; /* Make the arrow white */
+  animation: bounce 1.5s infinite; /* Apply bounce animation */
+}
+
+/* Bounce animation keyframes */
+@keyframes bounce {
+  0% {
+    transform: translateY(0); /* Start at the original position */
+  }
+  30% {
+    transform: translateY(-10px); /* Move up */
+  }
+  50% {
+    transform: translateY(0); /* Return to the original position */
+  }
+  70% {
+    transform: translateY(-5px); /* Small bounce up */
+  }
+  100% {
+    transform: translateY(0); /* Final position */
+  }
+}
+
+
+@media (max-width: 750px) {
+  .modal-container {
+    width: 90%;
+  }
+
+  .modal-right {
+    display: none;
+  }
+}
+
+/* Add the following CSS code to style.css file */
+
+#redirectToIndex {
+  background-color: #007bff; /* Change the background color to match the Login button */
+  color: #fff; /* Change the text color to white */
+  padding: 15px 32px;        /* Add padding around the text */
+  font-size: 10px;       
+  border: none;              /* Remove default border */
+  /* Font size */
+  border-radius: 50px;       /* Rounded corners */
+  cursor: pointer;          /* Pointer cursor on hover */
+  transition: all 0.3s ease; /* Smooth transition for all changes */
+  width: 40%;               /* Make button full width */
+  max-width: 300px;          /* Max width for the button */
+  text-align: center;        /* Center align text */
+  display: inline-block;     /* Make button behave like an inline block */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); /* Shadow effect */
+}
+
+#redirectToIndex:hover {
+  background-color: #0056b3;  /* Darker background color on hover */
+  transform: scale(1.05);      /* Slight scale effect on hover */
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); /* Stronger shadow on hover */
+}
+
+        /* Styling for the Login Button */
+        #loginBtn {
+            background-color: #007bff; /* Button color */
+            color: white;              /* Text color */
+            border: none;              /* Remove default border */
+            padding: 15px 32px;        /* Add padding around the text */
+            font-size: 10px;           /* Font size */
+            border-radius: 50px;       /* Rounded corners */
+            cursor: pointer;          /* Pointer cursor on hover */
+            transition: all 0.3s ease; /* Smooth transition for all changes */
+            width: 50%;               /* Make button full width */
+            max-width: 300px;          /* Max width for the button */
+            text-align: center;        /* Center align text */
+            display: inline-block;     /* Make button behave like an inline block */
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); /* Shadow effect */
+        }
+
+        /* Hover Effect */
+        #loginBtn:hover {
+            background-color: #0056b3;  /* Darker background color on hover */
+            transform: scale(1.05);      /* Slight scale effect on hover */
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); /* Stronger shadow on hover */
+        }
+
+        /* Focus Effect */
+        #loginBtn:focus {
+            outline: none; /* Remove default focus outline */
+        }
+

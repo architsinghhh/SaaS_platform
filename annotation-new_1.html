@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Tab</title>
+    <style>
+        @media (max-width: 400px) {
+    body {
+        flex-direction: column;
+        animation: gradientAnimation 15s ease infinite;
+        background: linear-gradient( #ffffff, #8aadd9);
+      
+    }
+    .sidebar {
+        width: 250px; /* Fixed width for the sidebar */
+        overflow-y: auto;
+    animation: gradientAnimation 15s ease infinite;
+    background: linear-gradient( #ffffff, #8aadd9);
+        border-right: 2px solid #ccc;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: absolute; /* Position the sidebar absolutely */
+        z-index: 10; /* Ensure the sidebar is above the canvas */
+    }
+    
+    
+    /* Top-bar layout for Choose Files and Refresh button */
+    .top-bar {
+        display: flex;
+        align-items: center; /* Center vertically */
+        justify-content: space-between; /* Push buttons apart */
+        width: 100%; /* Full width within sidebar */
+        gap: 10px;
+    }
+   
+}
+
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: "Changa", sans-serif;
+            background: linear-gradient( #ffffff, #8aadd9);
+        }
+        .container {
+            display: flex;
+            flex: 1;
+          
+            position: relative; /* Set relative positioning for the container */
+        }
+        .sidebar {
+            width: 250px; /* Fixed width for the sidebar */
+            overflow-y: auto;
+            background: linear-gradient( #ffffff, #8aadd9);
+            border-right: 2px solid #ccc;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10; /* Ensure the sidebar is above the canvas */
+        }
+        .image-list {
+            margin-bottom: 15px;
+        }
+        .image-thumbnail {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            margin-bottom: 8px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+            transition: filter 0.3s ease, border-color 0.3s ease;
+
+        }
+        .image-thumbnail:hover {
+            border-color: #007bff;
+        }
+        .image-thumbnail.selected {
+            border-color: blue;
+        }
+       
+        canvas {
+            max-width: 900px; /* Match the canvas width */
+            max-height: 500px; /* Match the canvas height */
+            border-radius: 5px;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: -50px;
+            right: 5%;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+           
+        }
+        .zoom-controls .zoom-button {
+            background-color: rgb(0, 0, 0);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            
+        }
+        
+        
+        .zoom-button {
+            background-color: #007bff;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 26px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+        }
+        
+        .zoom-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.15);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .zoom-button:active {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .zoom-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+        }
+        
+        #popup {
+            position: fixed;
+            display: none;
+            border: 2px solid #007bff;
+            background-color: white;
+            padding: 10px;
+            z-index: 10;
+            border-radius: 5px;
+            width: 200px; /* Adjust width for better display */
+            top: 10%;
+   margin-left: 80%;
+
+        }
+        
+        .form-container {
+            padding: 15px;
+            margin-left: 20px;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+        .button-group {
+            display: flex; /* Ensure buttons are displayed in a row */
+            justify-content: flex-end; /* Align buttons to the right */
+            margin-top: 60%; /* Space above the button group */
+            width: 100%; /* Ensure the button group takes full width */
+        }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px; /* Space between buttons */
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            font-family: "Changa", sans-serif;
+
+        }
+
+        /* Header styling */
+        header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        /* Hamburger menu icon */
+        /* Hamburger menu icon */
+.menu-icon {
+    width: 40px; /* Increased width */
+    height: 30px; /* Set height to accommodate all lines */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensure even spacing between lines */
+    cursor: pointer;
+    z-index: 9999;
+}
+
+.line {
+    width: 100%;
+    height: 4px;
+    background-color: black;
+    margin: 0; /* Remove margin to avoid gaps between lines */
+    transition: all 0.3s ease;
+}
+
+
+        /* Navigation bar */
+        nav {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 200px;
+            background-color: rgba(5, 21, 123, 0.5);
+            transform: translateX(100%);
+            transition: transform 0.5s ease;
+            z-index: 9998;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 50px 20px;
+        }
+
+        nav ul li {
+            margin: 20px 0;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: lightgray;
+        }
+
+        /* Sections styling */
+        section {
+            padding: 100px 20px;
+            height: 100vh;
+        }
+
+        #home {
+            background-color: lightblue;
+        }
+
+        #services {
+            background-color: lightgreen;
+        }
+
+        /* Active navigation */
+        .nav-visible {
+            transform: translateX(0);
+        }
+        .close-icon {
+    font-size: 30px; /* Size of the close icon */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    margin: 10px; /* Spacing from the edges */
+    color: black; /* Color of the icon */
+}
+/* Highlighted thumbnail when it has annotations */
+.image-thumbnail.annotated-thumbnail {
+    border: 3px solid orange; /* For images with annotations */
+}
+/* Blurred and tick styles for annotated thumbnails */
+.image-thumbnail.annotated {
+    filter: blur(2px); /* Slight blur effect */
+    position: relative;
+    opacity: 0.8;
+}
+
+/* Green tick overlay */
+.image-thumbnail.annotated::after {
+    content: "\2713"; /* Unicode for checkmark */
+    color: green;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: white;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+
+
+
+.navigation-buttons {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    top: 103%;
+}
+
+.navigation-buttons button {
+    pointer-events: auto;
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    color: #444;
+    transition: transform 0.2s, color 0.2s;
+    cursor: pointer;
+    margin-top: 20%;
+    margin: 0 20px;
+}
+
+.navigation-buttons button:hover {
+    transform: scale(1.2);
+    color: #0073e6;
+}
+
+.navigation-buttons button:active {
+    transform: scale(1);
+}
+
+
+
+#prevButton {
+    animation: bounce 2s infinite;
+}
+
+#nextButton {
+    animation: bounce 2s infinite;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    color: white;
+    background-color: #0073e6;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 115, 230, 0.2); /* Subtle shadow for depth */
+}
+
+/* Hover effect for Choose Files button */
+.custom-file-upload:hover {
+    background-color: #005bb5;
+    box-shadow: 0px 6px 12px rgba(0, 115, 230, 0.4);
+}
+
+.custom-file-upload:active {
+    background-color: #004a99; /* Even darker on click */
+    box-shadow: 0px 2px 6px rgba(0, 115, 230, 0.2); /* Subtle shadow */
+    transform: scale(0.98); /* Slight shrink on click */
+}
+
+/* Hide the actual file input */
+#imageLoader {
+    display: none;
+}
+
+#imageComment {
+    width: 300px;
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    resize: none;
+    overflow-y: auto;
+}
+
+/* Common styling for all buttons */
+.button-group {
+    margin-top: 10px;
+    display: flex; /* Ensure buttons are displayed in a row */
+    justify-content: flex-start; /* Align buttons to the start */
+    padding-left: 20px; /* Add padding to the left to move buttons to the right */
+}
+
+/* Save Annotations Button - Rounded Style */
+#saveAnnotationsButton {
+    background-color: #397dc1; /* Green background */
+    color: white;
+    width: 15%;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    font-family: "Changa", sans-serif;
+    box-shadow: 0px 4px 10px rgba(0, 115, 230, 0.2); /* Subtle shadow for depth */
+    padding: 1%;
+    
+}
+
+#saveAnnotationsButton:hover {
+    background-color: #001f3f; /* Darker green on hover */
+    box-shadow: 0px 6px 12px #001f3f;
+}
+
+#saveAnnotationsButton:active {
+    background-color: #001f3f; /* Even darker green on click */
+    transform: scale(0.98);
+}
+
+/* Undo Button - Rectangular Style with Rounded Corners */
+#deleteButton {
+    background-color: #dc3545; /* Red background */
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-family: "Changa", sans-serif;
+    box-shadow: 0px 4px 10px rgba(220, 53, 69, 0.2);
+}
+
+#deleteButton:hover {
+    background-color: #c82333; /* Darker red on hover */
+    box-shadow: 0px 6px 12px rgba(220, 53, 69, 0.3);
+}
+
+#deleteButton:active {
+    background-color: #bd2130; /* Even darker red on click */
+    transform: scale(0.98);
+}
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1050px;
+    height: 500px; /* Match the canvas height */
+    animation: gradientAnimation 15s ease infinite;
+    background: linear-gradient( #ffffff, #8aadd9);
+margin-top: 120px;
+    margin-left: 50px;
+}
+
+.canvas-container canvas {
+    max-width: 100%; /* Set the max-width to 100% to fill the container */
+    max-height: 100%; /* Set the max-height to 100% to fill the container */
+    border-radius: 5px;
+}
+
+/* Hide placeholder when image is loaded */
+.canvas-container canvas.loaded + #canvasPlaceholder {
+    display: none;
+}
+
+.image-thumbnail {
+    border: 2px solid transparent; /* Default border style */
+}
+
+.selected-orange {
+    border: 2px solid orange; /* Highlight for annotated images */
+    filter: blur(2px); 
+}
+.annotated {
+    filter: blur(2px);
+    position: relative;
+}
+
+
+
+
+.selected-blue {
+    border: 2px solid blue; /* Highlight for the currently viewed image */
+    filter: blur(2px);
+}
+
+/* General container styling */
+.popup-container {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    margin-top: 7%;
+    margin-right: 1%;
+    font-family: "Changa", sans-serif;
+  
+  }
+
+/* Class selector styling */
+.class-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.class-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.class-list label {
+    font-size: 14px;
+    color: #333;
+}
+
+.add-class-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-class-button:hover {
+    background-color: #0056b3;
+}
+
+/* Severity section styling */
+.severity-section {
+    margin-bottom: 20px;
+}
+
+.severity-section h3 {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.severity-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.severity-checkboxes label {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Confirm button styling */
+.confirm-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #218838;
+}
+
+/* Add transitions for smoother interactions */
+input[type="radio"],
+input[type="checkbox"] {
+    accent-color: #007bff;
+}
+
+/* Styling for the refresh button */
+.refresh-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    margin-left: 70%;
+    margin-top: -20%;
+    background-color: #007bff; /* Primary blue color */
+    color: white;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect for Refresh button */
+.refresh-button:hover {
+    background-color: #0056b3;
+    transform: rotate(180deg);
+}
+
+.footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ccc;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Image list container */
+.image-list {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.refresh-button:active {
+    background-color: #003d80; /* Even darker blue for active state */
+    transform: scale(0.95); /* Slightly shrink when clicked */
+}
+
+.add-class-section {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    margin-top: 10px; /* Space above the section */
+    gap: 5px; /* Space between input and button */
+}
+
+.add-class-section input[type="text"] {
+    width: 120px; /* Set a fixed width for the input field */
+    padding: 8px; /* Adjust padding for a smaller input */
+    border: 2px solid #007bff; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Smaller font size */
+    transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.add-class-section input[type="text"]:focus {
+    border-color: #0056b3; /* Darker border on focus */
+    outline: none; /* Remove default outline */
+}
+
+.add-class-section button {
+    background-color: #007bff; /* Button background color */
+    color: white; /* Button text color */
+    padding: 8px 10px; /* Adjust padding for a smaller button */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 10px; /* Smaller font size */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+}
+
+.add-class-section button:hover {
+    background-color: #0056b3; /* Darker background on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.add-class-section button:active {
+    transform: scale(0.95); /* Slightly shrink on click */
+}
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
+<body>
+    <header>
+        <div class="menu-icon" onclick="toggleNav()">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </header>
+    <nav id="navbar" class="nav-hidden" >
+        <div class="close-icon" onclick="toggleNav()">&times;</div> <!-- Close icon -->
+        <ul>
+            <li><a href="afterlogin_new.html">Menu</a></li>
+            <li><a href="drone-tab-new.html">Drone-tab</a></li>
+            <li><a href="model-view-new.html">Model-View</a></li>
+        </ul>
+    </nav>
+  
+
+
+    <div class="container">
+        
+        <div class="sidebar">
+            <div class="top-bar">
+                <label class="custom-file-upload">
+                    <input type="file" id="imageLoader" multiple>Choose files
+                </label>
+                <button id="refreshButton" class="refresh-button" title="Refresh">
+                    🔄
+                </button>
+            </div>
+            <div class="image-list"></div>
+        </div>
+        
+        
+        <div class="canvas-container"style="position: relative;"> 
+            <div id="canvasPlaceholder"></div>
+            
+            <canvas id="canvas" width="5500" height="3400" style="width: 100%; height: auto;"></canvas>
+                
+
+            <div class="zoom-controls">
+                <button id="zoomInButton" class="zoom-button" style="background-color: rgb(0, 0, 0); border-radius: 50%; width: 20px; height: 20px; margin-top:-100%;">+</button>
+                <button id="zoomOutButton" class="zoom-button" style="background-color: rgb(0, 0, 0); border-radius: 50%; width: 20px; height: 20px;margin-top:-100%;">-</button>
+                <button id="resetButton" class="zoom-button" style="background-color: rgb(0, 0, 0); border-radius: 50%; width: 20px; height: 20px;margin-top:-100%;">🔄️</button>
+            </div>
+
+            
+            <div id="popup" class="popup-container">
+                <div id="classSelector" class="class-selector">
+                    <div id="classList" class="class-list">
+                        <label>
+                            <input type="radio" name="classType" value="Cracks"> Cracks
+                        </label>
+                        <label>
+                            <input type="radio" name="classType" value="Seepage"> Seepage
+                        </label>
+                        <label>
+                            <input type="radio" name="classType" value="Paint"> Paint
+                        </label>
+                        <label>
+                            <input type="radio" name="classType" value="Leakage"> Leakage
+                        </label>
+                    </div>
+                </div>
+                <div class="add-class-section">
+                    <input type="text" id="customClassInput" placeholder="Add Class" />
+                    <button id="addCustomClassButton" class="add-class-button">+</button>
+                </div>
+                
+                <!-- Severity Section -->
+                <div class="severity-section">
+                    <h3>Severity Level</h3>
+                    <div class="severity-checkboxes">
+                        <label>
+                            <input type="checkbox" id="severityLevel" name="defectLevel" value="major">
+                            Major Defect
+                        </label>
+                        <label>
+                            <input type="checkbox" id="severityLevelMinor" name="defectLevel" value="minor">
+                            Minor Defect
+                        </label>
+                    </div>
+                </div>
+              
+                <button id="confirmButton" class="confirm-button">Confirm Annotation</button>
+            </div>
+            
+          
+
+            <div class="navigation-buttons">
+                <button id="prevButton" aria-label="Previous Slide">
+                    <i class="fas fa-chevron-circle-left"></i>
+                </button>
+                <button id="nextButton" aria-label="Next Slide">
+                    <i class="fas fa-chevron-circle-right"></i>
+                </button>
+            </div>
+
+            
+            <div class="button-group" style="position: absolute; justify-content: flex-end; margin-top: -580px; margin-left: -90px;">
+                <!--  <button id="chooseDirButton" class="button">Choose Directory</button>-->
+              <div id="commentModal" style="display: none;">
+                <textarea id="commentText" placeholder="Enter your comment..."></textarea>
+                <button id="saveCommentBtn">OK</button>
+            </div>
+            <button id="saveAnnotationsButton" class="button" style="margin-right: 19px; ">Save Annotations</button>
+            <button id="finishButton" class="button" style="display: none;">Finish</button> <!-- Initially hidden -->
+            <button id="deleteButton" class="button">Undo</button>
+        </div>
+
+            <div id="commentBox" style="display: none;">
+                <textarea id="commentText" placeholder="Enter your comments here..." rows="4" cols="30"></textarea>
+                <button id="submitCommentButton" class="button">Submit</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        
+        let currentSlideIndex = 0; // Initialize the current slide index
+        const totalSlides = document.querySelectorAll('.slide').length; // Count the total number of slides
+
+
+        let zoomLevel = 1; // Initial zoom level
+        const zoomFactor = 0.1; // Amount to zoom in/out
+        let offsetX = 0; // Offset for zooming
+        let offsetY = 0; // Offset for zooming
+
+        let currentBoundingBox = null; 
+let requestId; // To store the request ID for canceling
+
+// Zoom In Button Event Listener
+document.getElementById('zoomInButton').addEventListener('click', () => {
+    zoomLevel = Math.min(3, zoomLevel + 0.2);
+    drawImageAndAnnotations();
+});
+
+document.getElementById('zoomOutButton').addEventListener('click', () => {
+    zoomLevel = Math.max(1, zoomLevel - 0.2);
+    if (zoomLevel === 1) {
+        offsetX = 0;
+        offsetY = 0;
+    }
+    drawImageAndAnnotations();
+});
+
+document.getElementById('resetButton').addEventListener('click', () => {
+    zoomLevel = 1;
+    offsetX = 0;
+    offsetY = 0;
+    drawImageAndAnnotations();
+});
+
+// Function to show the current slide based on index
+        function showSlide(index) {
+            // Hide all slides
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, i) => {
+                slide.style.display = i === index ? 'block' : 'none'; // Show the current slide
+            });
+        }
+
+
+// Initially show the first slide
+showSlide(currentSlideIndex);
+
+        // Function to toggle navigation visibility
+    function toggleNav() {
+    var nav = document.getElementById('navbar');
+    var lines = document.querySelectorAll('.line');
+
+    // Toggle the 'nav-visible' class to open/close the navigation
+    nav.classList.toggle('nav-visible');
+
+    // Update the appearance of the hamburger icon
+    lines.forEach((line) => {
+        if (nav.classList.contains('nav-visible')) {
+            line.classList.add('open'); // Change to X
+        } else {
+            line.classList.remove('open'); // Change back to hamburger
+        }
+    });
+}
+
+// Close the navigation bar when clicking outside of it
+document.addEventListener('click', function(event) {
+    var nav = document.getElementById('navbar');
+    var menuIcon = document.querySelector('.menu-icon');
+    var closeIcon = document.querySelector('.close-icon');
+
+    // Check if click is outside the navigation and menu icon
+    if (!nav.contains(event.target) && !menuIcon.contains(event.target) && !closeIcon.contains(event.target)) {
+        nav.classList.remove('nav-visible'); // Close the navigation
+        var lines = document.querySelectorAll('.line');
+        lines.forEach(line => line.classList.remove('open')); // Change back to hamburger
+    }
+});
+
+function markImageAsAnnotated(imageElement) {
+    imageElement.classList.add('annotated'); // Apply annotated styles
+}
+
+// Example usage: Mark an image as annotated after an action (e.g., save annotation)
+document.querySelectorAll('.image-thumbnail').forEach((thumbnail, index) => {
+    thumbnail.addEventListener('click', function() {
+        markImageAsAnnotated(thumbnail);
+    });
+});
+
+
+function updateImage(index) {
+    // Logic to update the displayed image based on the index
+    currentImageIndex = index;
+
+    // Check if the current image is the last one
+    if (currentImageIndex === images.length - 1) {
+        document.getElementById('finishButton').style.display = 'inline-block'; // Show Finish button
+    } else {
+        document.getElementById('finishButton').style.display = 'none'; // Hide Finish button
+    }
+}
+
+// Event listener for the Finish button
+document.getElementById('finishButton').addEventListener('click', function() {
+    document.getElementById('commentBox').style.display = 'block'; // Show comment box
+});
+
+// Event listener for the Submit button in the comment box
+document.getElementById('submitCommentButton').addEventListener('click', function() {
+    const comment = document.getElementById('commentText').value;
+
+    // Logic to save annotations and the comment
+    saveAnnotations(comment);
+
+    // Hide the comment box after submission
+    document.getElementById('commentBox').style.display = 'none';
+    document.getElementById('finishButton').style.display = 'none'; // Optionally hide the finish button
+});
+
+const annotationsData = {}; // Object to store annotations by filename
+
+function saveAnnotations(startX, startY, width, height, className, severity, color) {
+    // Get the current image object
+    const currentImage = images[currentImageIndex];
+
+    // Ensure the annotations array exists
+    if (!currentImage.annotations) {
+        currentImage.annotations = []; // Initialize if it doesn't exist
+    }
+
+    // Get the file name from the current image
+    const fileName = currentImage.fileName; // Assuming currentImage has a fileName property
+
+    // Calculate the right and bottom coordinates
+    const right = startX + width;
+    const bottom = startY + height;
+
+    // Create a new annotation object with the file name and other details
+    const newAnnotation = {
+        fileName: fileName, // Add the file name
+        startX: startX, // Use the dynamic value
+        startY: startY, // Use the dynamic value
+        right: right, // Calculated right value
+        bottom: bottom, // Calculated bottom value
+        class: className, // Use the dynamic value
+        severity: severity, // Use the dynamic value
+        color: color // Use the dynamic value
+    };
+
+    // Push the new annotation to the current image's annotations array
+    currentImage.annotations.push(newAnnotation);
+
+    // Log the saved annotations for debugging
+    console.log("New annotation saved:", newAnnotation);
+    console.log("Updated annotations for", fileName, ":", currentImage.annotations);
+
+    // Add the annotation to annotationsData by filename
+    if (!annotationsData[fileName]) {
+        annotationsData[fileName] = []; // Initialize if not already there
+    }
+    annotationsData[fileName].push(newAnnotation);
+
+    // Log the updated annotationsData for debugging
+    console.log("Annotations data:", annotationsData);
+}
+
+// Function to send the structured annotationsData object to the server
+async function saveAnnotationsToServer() {
+    try {
+        const response = await fetch('http://localhost:5000/saveAnnotations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(annotationsData) // Send the structured annotationsData
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save annotations');
+        }
+
+        const result = await response.json();
+        console.log('Annotations saved to server:', result);
+    } catch (error) {
+        console.error('Error saving annotations to server:', error);
+    }
+}
+
+
+
+
+// Optional: You can use this function for navigation
+function goHome() {
+    alert("Navigating to Home!");
+}
+
+// Assuming you have a button for the hamburger icon
+        const imageLoader = document.getElementById('imageLoader');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const classSelector = document.getElementById('classSelector');
+        const severitySlider = document.getElementById('severityLevel');
+        
+        const severityValue = document.getElementById('severityValue');
+        const popup = document.getElementById('popup');
+        const confirmButton = document.getElementById('confirmButton');
+        const imageListContainer = document.querySelector('.image-list');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const saveAnnotationsButton = document.getElementById('saveAnnotationsButton');
+        const addClassButton = document.getElementById('addClassButton');
+        const classList = document.getElementById('classList');
+        const commentModal = document.getElementById('commentModal');
+        const commentText = document.getElementById('commentText');
+        const saveCommentBtn = document.getElementById('saveCommentBtn');
+        
+        
+        let images = [];
+        let annotations = [];
+        let isDrawing = false;
+        let startX, startY, endX, endY;
+        let currentImageIndex = 0;
+        canvas.width = 5500; // Original width
+        canvas.height = 3400; // Original height
+        // Define color mapping for each class
+
+        let isPanning = false;
+        let lastX, lastY;
+
+        // Display severity value
+        severitySlider.addEventListener('input', () => {
+            severityValue.textContent = severitySlider.value;
+        });
+
+        
+// Load multiple images on file input change
+const fixedCanvasWidth = 5500; // Reduced width
+const fixedCanvasHeight = 3400; // Reduced height
+
+imageLoader.addEventListener('change', (event) => {
+    const files = event.target.files;
+    if (files.length) {
+        // Loop through the selected files and create thumbnails for them
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    // Push the new image to the images array
+                    images.push({ image: img, annotations: [] }); // Append new image to existing images
+                    createThumbnail(img.src); // Create thumbnail for the image
+                    drawImageAndAnnotations(); // Draw the newly added image immediately
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+});
+
+
+        
+canvas.addEventListener('mousedown', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const currentImage = images[currentImageIndex].image;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    
+    // Calculate scale to fit the image
+    const imageScaleX = canvasWidth / currentImage.width;
+    const imageScaleY = canvasHeight / currentImage.height;
+    const imageScale = Math.min(imageScaleX, imageScaleY);
+    
+    const scaledWidth = currentImage.width * imageScale;
+    const scaledHeight = currentImage.height * imageScale;
+    
+    const centerOffsetX = (canvasWidth - scaledWidth * zoomLevel) / 2;
+    const centerOffsetY = (canvasHeight - scaledHeight * zoomLevel) / 2;
+    
+    const mouseX = (event.clientX - rect.left) * scaleX;
+    const mouseY = (event.clientY - rect.top) * scaleY;
+
+    // Prevent default text selection and other default behaviors
+    event.preventDefault();
+    
+    // If zoomed in, enable panning
+    if (zoomLevel > 1) {
+        isPanning = true;
+        lastX = mouseX;
+        lastY = mouseY;
+        canvas.style.cursor = 'grab';
+        return;
+    }
+
+    // Check if the mouse is within the image bounds
+    const isWithinImageBounds = 
+        mouseX >= centerOffsetX && 
+        mouseX <= (centerOffsetX + scaledWidth * zoomLevel) &&
+        mouseY >= centerOffsetY && 
+        mouseY <= (centerOffsetY + scaledHeight * zoomLevel);
+
+    // Normal drawing mode, only start drawing if not zoomed in and within image bounds
+    if (isImageLoaded() && zoomLevel === 1 && isWithinImageBounds) {
+        const adjustedX = (mouseX - centerOffsetX) / (zoomLevel * imageScale);
+        const adjustedY = (mouseY - centerOffsetY) / (zoomLevel * imageScale);
+
+        startX = adjustedX;
+        startY = adjustedY;
+        isDrawing = true;
+    }
+});
+
+canvas.addEventListener('mousemove', (event) => {
+    // Prevent default text selection and other default behaviors
+    event.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const currentImage = images[currentImageIndex].image;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    
+    // Calculate scale to fit the image
+    const imageScaleX = canvasWidth / currentImage.width;
+    const imageScaleY = canvasHeight / currentImage.height;
+    const imageScale = Math.min(imageScaleX, imageScaleY);
+    
+    const scaledWidth = currentImage.width * imageScale;
+    const scaledHeight = currentImage.height * imageScale;
+    
+    const centerOffsetX = (canvasWidth - scaledWidth * zoomLevel) / 2;
+    const centerOffsetY = (canvasHeight - scaledHeight * zoomLevel) / 2;
+    
+    const mouseX = (event.clientX - rect.left) * scaleX;
+    const mouseY = (event.clientY - rect.top) * scaleY;
+
+    // Panning logic for zoomed-in state
+    if (isPanning && zoomLevel > 1) {
+        const deltaX = mouseX - lastX;
+        const deltaY = mouseY - lastY;
+        
+        offsetX += deltaX;
+        offsetY += deltaY;
+        
+        lastX = mouseX;
+        lastY = mouseY;
+        
+        drawImageAndAnnotations();
+        return;
+    }
+
+    // Check if the mouse is within the image bounds
+    const isWithinImageBounds = 
+        mouseX >= centerOffsetX && 
+        mouseX <= (centerOffsetX + scaledWidth * zoomLevel) &&
+        mouseY >= centerOffsetY && 
+        mouseY <= (centerOffsetY + scaledHeight * zoomLevel);
+
+    // Drawing bounding box only when not zoomed in and within image bounds
+    if (isDrawing && zoomLevel === 1 && isWithinImageBounds) {
+        const adjustedX = (mouseX - centerOffsetX) / (zoomLevel * imageScale);
+        const adjustedY = (mouseY - centerOffsetY) / (zoomLevel * imageScale);
+        
+        endX = adjustedX;
+        endY = adjustedY;
+        
+        drawImageAndAnnotations();
+    }
+});
+
+canvas.addEventListener('mouseup', (event) => {
+    // Prevent default text selection and other default behaviors
+    event.preventDefault();
+
+    // Reset panning state
+    if (isPanning) {
+        isPanning = false;
+        canvas.style.cursor = 'default';
+        return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const currentImage = images[currentImageIndex].image;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    
+    // Calculate scale to fit the image
+    const imageScaleX = canvasWidth / currentImage.width;
+    const imageScaleY = canvasHeight / currentImage.height;
+    const imageScale = Math.min(imageScaleX, imageScaleY);
+    
+    const scaledWidth = currentImage.width * imageScale;
+    const scaledHeight = currentImage.height * imageScale;
+    
+    const centerOffsetX = (canvasWidth - scaledWidth * zoomLevel) / 2;
+    const centerOffsetY = (canvasHeight - scaledHeight * zoomLevel) / 2;
+    
+    const mouseX = (event.clientX - rect.left) * scaleX;
+    const mouseY = (event.clientY - rect.top) * scaleY;
+
+    // Check if the mouse is within the image bounds
+    const isWithinImageBounds = 
+        mouseX >= centerOffsetX && 
+        mouseX <= (centerOffsetX + scaledWidth * zoomLevel) &&
+        mouseY >= centerOffsetY && 
+        mouseY <= (centerOffsetY + scaledHeight * zoomLevel);
+
+    // Drawing bounding box only when not zoomed in and within image bounds
+    if (isDrawing && zoomLevel === 1 && isWithinImageBounds) {
+        isDrawing = false;
+        
+        const currentImage = images[currentImageIndex].image;
+        
+        // Check if the bounding box has a minimum size
+        if (Math.abs(endX - startX) > 10 && Math.abs(endY - startY) > 10) {
+            // Show popup for annotation
+            popup.style.display = 'block';
+        }
+    }
+});
+
+document.addEventListener('dragstart', (e) => {
+    e.preventDefault();
+});
+
+
+
+
+function drawBoundingBox() {
+    ctx.strokeStyle = 'blue'; // Set the color for the bounding box
+    ctx.lineWidth = 10; // Set the line width
+    ctx.strokeRect(startX, startY, endX - startX, endY - startY); // Draw the rectangle
+}
+
+
+        // Function to confirm annotation
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            // Your existing logic for confirming the annotation...
+        
+            // Hide the popup after confirming
+            popup.style.display = 'none'; // Hide the popup
+        });
+
+// Next arrow button event listener for navigating images
+
+
+// Previous arrow button event listener for navigating images
+prevButton.addEventListener('click', () => {
+    currentImageIndex--;
+    if (currentImageIndex < 0) {
+        currentImageIndex = images.length - 1; // Loop back to the last image if at the beginning
+    }
+    drawImageAndAnnotations(); // Redraw the image and its annotations
+    updateThumbnailHighlighting(); // Update thumbnail highlighting
+    updateCommentBox(currentImageIndex); // Update the comment box
+});
+
+        deleteButton.addEventListener('click', () => {
+            if (images[currentImageIndex].annotations.length > 0) {
+                images[currentImageIndex].annotations.pop(); // Remove last annotation
+                drawImageAndAnnotations(); // Redraw without the last annotation
+            }
+        });
+
+        saveAnnotationsButton.addEventListener('click', () => {
+            const annotationsData = images.map((img, index) => ({
+                imageIndex: index,
+                annotations: img.annotations
+            }));
+            console.log('Annotations:', annotationsData);
+            alert('Annotations saved successfully!');
+        });
+
+        document.addEventListener('click', (event) => {
+    // Get the bounding rectangles of the canvas and popup
+    const canvasRect = canvas.getBoundingClientRect();
+    const popupRect = popup.getBoundingClientRect();
+
+    // Check if the click is outside the canvas and popup
+    const isClickInsideCanvas = event.clientX >= canvasRect.left && 
+                                 event.clientX <= canvasRect.right && 
+                                 event.clientY >= canvasRect.top && 
+                                 event.clientY <= canvasRect.bottom;
+
+    const isClickInsidePopup = event.clientX >= popupRect.left && 
+                                event.clientX <= popupRect.right && 
+                                event.clientY >= popupRect.top && 
+                                event.clientY <= popupRect.bottom;
+
+    if (!isClickInsideCanvas && !isClickInsidePopup) {
+        popup.style.display = 'none'; // Hide the popup if click is outside
+    }
+});
+
+// Function to update the comment box
+function updateCommentBox(index) {
+    const comment = getImageComment(index);
+    if (comment) {
+        document.getElementById('imageComment').value = comment;
+    } else {
+        document.getElementById('imageComment').value = '';
+    }
+}
+
+// Create an array to store comments for each image
+let imageComments = [];
+
+// Function to save comment for each image
+function saveImageComment(index, comment) {
+    if (!imageComments[index]) {
+        imageComments[index] = comment;
+    } else {
+        imageComments[index] = comment;
+    }
+}
+
+// Function to get comment for each image
+function getImageComment(index) {
+    return imageComments[index];
+}
+
+// Add a comment box for each image
+const commentBox = document.createElement('div');
+commentBox.innerHTML = `
+    <textarea id="imageComment" placeholder="Enter your comment..."></textarea>
+`;
+document.querySelector('.button-group').appendChild(commentBox);
+
+// Event listener to save comment for each image
+document.getElementById('imageComment').addEventListener('input', () => {
+    const comment = document.getElementById('imageComment').value.trim();
+    saveImageComment(currentImageIndex, comment);
+});
+
+
+saveAnnotationsButton.addEventListener('click', async () => {
+    // Get comments for each image
+    const annotationsData = images.map((imgData, index) => {
+        return {
+            imageIndex: index,
+            annotations: imgData.annotations,
+            comment: getImageComment(index)
+        };
+    });
+
+    const blob = new Blob([JSON.stringify(annotationsData, null, 2)], { type: "application/json" });
+
+    // Step 3: Check for File System Access API support and save locally
+    if ('showDirectoryPicker' in window) {
+        try {
+            // Open a folder picker
+            const handle = await window.showDirectoryPicker();
+            
+            // Create a new file in the selected directory
+            const fileHandle = await handle.getFileHandle('annotations.json', { create: true });
+            
+            // Create a writable stream
+            const writableStream = await fileHandle.createWritable();
+            
+            // Write the blob data to the file
+            await writableStream.write(blob);
+            
+            // Close the stream
+            await writableStream.close();
+            
+            alert('Annotations saved successfully in the selected folder!');
+        } catch (error) {
+            console.error('Error saving annotations:', error);
+        }
+    } else {
+        // Fallback for browsers that don't support the File System Access API
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'annotations.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Step 4: Send the annotations and comment to the server
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project_id');
+
+    if (!projectId) {
+        alert("Project ID not found in URL");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/save_annotations", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                project_id: projectId,
+                annotations: annotationsData
+            })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+        } else {
+            console.error(result.message);
+        }
+    } catch (error) {
+        console.error("Error saving annotations:", error);
+    }
+});
+
+
+const urlParams = new URLSearchParams(window.location.search);
+const projectId = urlParams.get("project_id"); // Get project_id from URL
+
+function updateLinks() {
+  if (projectId) {
+    const links = document.querySelectorAll("#navbar a");
+    links.forEach((link, index) => {
+      // Skip the first link (index 0)
+      if (index !== 0) {
+        const url = new URL(link.href);
+        url.searchParams.set("project_id", projectId); // Append project_id to the URL
+        link.href = url.toString(); // Update the link's href attribute
+      }
+    });
+  }
+}
+
+window.onload = updateLinks;
+
+function refreshImages() {
+    // Save the current image index to navigate properly
+    const currentImageSrc = images[currentImageIndex]?.image.src;
+
+    // Sort images: unprocessed (no annotations) first
+    images.sort((a, b) => {
+        const aProcessed = a.annotations.length > 0;
+        const bProcessed = b.annotations.length > 0;
+        return (aProcessed === bProcessed) ? 0 : aProcessed ? 1 : -1;
+    });
+
+    // Find the first unannotated image, if any
+    const firstUnannotatedImage = images.find(img => img.annotations.length === 0);
+    
+    // Reset to the first unannotated image if exists, otherwise to the first image
+    if (firstUnannotatedImage) {
+        currentImageIndex = images.indexOf(firstUnannotatedImage); // Set to the first unannotated image
+    } else {
+        currentImageIndex = 0; // If no unannotated image, reset to the first image
+    }
+
+    // Draw the current image and its annotations
+    drawImageAndAnnotations();
+
+    // Log to see what happened
+    console.log("Current image index after refresh:", currentImageIndex);
+
+    // Reset the image list container and recreate thumbnails
+    imageListContainer.innerHTML = ''; // Clear current thumbnails
+
+    // Recreate thumbnails based on the updated image order
+    images.forEach((img, index) => {
+        createThumbnail(img.image.src); // Recreate the thumbnail
+    });
+
+    // Reapply highlighting to thumbnails based on annotations
+    updateThumbnailHighlighting();
+}
+
+refreshButton.addEventListener('click', () => {
+    // Log the order of images before refresh
+    console.log("Before refresh:", images.map(img => img.image.src));
+
+    // Call refreshImages to handle sorting and display
+    refreshImages();
+});
+// Draw image and annotations on canvas, and keep the canvas highlighted
+    let imageBounds = { x: 0, y: 0, width: 0, height: 0 }; // To store the bounds of the drawn image
+    function drawImageAndAnnotations() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        if (!images[currentImageIndex]) return;
+
+        const currentImage = images[currentImageIndex].image;
+
+        // Calculate canvas and image dimensions
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const imageWidth = currentImage.width;
+        const imageHeight = currentImage.height;
+
+        // Calculate scale to fit the image in canvas while maintaining aspect ratio
+        const scaleX = canvasWidth / imageWidth;
+        const scaleY = canvasHeight / imageHeight;
+        const scale = Math.min(scaleX, scaleY);
+
+        // Calculate new image dimensions
+        const scaledWidth = imageWidth * scale;
+        const scaledHeight = imageHeight * scale;
+
+        // Calculate centering offsets
+        const centerOffsetX = (canvasWidth - scaledWidth * zoomLevel) / 2;
+        const centerOffsetY = (canvasHeight - scaledHeight * zoomLevel) / 2;
+
+        // Apply zoom and pan transformations
+        ctx.save();
+
+        // Translate to center and apply zoom
+        ctx.translate(centerOffsetX + offsetX, centerOffsetY + offsetY);
+        ctx.scale(zoomLevel, zoomLevel);
+
+        // Draw the image scaled to fit
+        ctx.drawImage(currentImage, 0, 0, scaledWidth, scaledHeight);
+
+        // Draw existing annotations (scaled proportionally)
+        const currentAnnotations = images[currentImageIndex].annotations;
+        // Draw existing annotations (scaled proportionally)
+        currentAnnotations.forEach(annotation => {
+        const scaledAnnotationX = annotation.startX * scale;
+        const scaledAnnotationY = annotation.startY * scale;
+        const scaledAnnotationWidth = annotation.width * scale;
+        const scaledAnnotationHeight = annotation.height * scale;
+
+        ctx.strokeStyle = annotation.color || 'blue';
+        ctx.lineWidth = 15 / zoomLevel; // Adjust line width based on zoom
+        ctx.strokeRect(
+            scaledAnnotationX,
+            scaledAnnotationY,
+            scaledAnnotationWidth,
+            scaledAnnotationHeight
+        );
+
+        // Draw the class name and severity level on the left or right side of the annotation
+        const labelText = annotation.severity ? `${annotation.class} (${annotation.severity})` : annotation.class;
+        ctx.fillStyle = 'Red'; // Set fill color for text
+        ctx.font = '100px  Changa';
+
+        // Check if the annotation is on the left half or right half of the frame
+        const centerX = canvas.width / 2;
+        const annotationCenterX = scaledAnnotationX + (scaledAnnotationWidth / 2);
+
+        let textX, textY;
+        if (annotationCenterX < centerX) {
+            // Annotation is on the left half, draw text on the right side
+            textX = scaledAnnotationX + scaledAnnotationWidth + 10; // Add some padding
+            textY = scaledAnnotationY + (scaledAnnotationHeight / 2) + 5; // Vertically centered with slight offset
+        } else {
+            // Annotation is on the right half, draw text on the left side
+            textX = scaledAnnotationX - 150; // Subtract some padding
+            textY = scaledAnnotationY + (scaledAnnotationHeight / 2) + 5; // Vertically centered with slight offset
+        }
+
+        // Draw text horizontally on the left or right side
+        ctx.fillText(labelText, textX, textY);
+    });
+    // If currently drawing, show the temporary bounding box
+        if (isDrawing) {
+        
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 15 / zoomLevel;
+            ctx.strokeRect(
+                Math.min(startX * scale, endX * scale),
+                Math.min(startY * scale, endY * scale),
+                Math.abs(endX - startX) * scale,
+                Math.abs(endY - startY) * scale
+            );
+        }
+
+        ctx.restore();
+    }
+function isImageLoaded() {
+    return images[currentImageIndex] && images[currentImageIndex].image;
+}
+
+
+
+// Event listener to save the comment and proceed with saving annotations
+saveCommentBtn.addEventListener('click', () => {
+    const comment = commentText.value.trim(); // Get the comment
+
+    // Save the comment along with the annotations
+    console.log('Comment saved:', comment);
+
+    // Call saveAnnotations function with the comment
+    saveAnnotations(comment);
+
+    // Close the modal
+    closeCommentModal();
+});
+
+// Event listener to trigger the modal before saving
+saveAnnotationsButton.addEventListener('click', () => {
+    openCommentModal();
+});
+
+
+// Select all thumbnails
+const thumbnails = document.querySelectorAll('.thumbnail');
+
+// Function to handle active thumbnail
+function setActiveThumbnail(index) {
+  // Remove 'active' class from all thumbnails
+  thumbnails.forEach((thumbnail) => {
+    thumbnail.classList.remove('active');
+  });
+
+  // Add 'active' class to the current thumbnail
+  thumbnails[index].classList.add('active');
+}
+
+// Example function that gets called when annotation is created
+function createAnnotation(index) {
+  // Set the corresponding thumbnail as active
+  setActiveThumbnail(index);
+}
+
+// Example: Assuming you trigger the annotation with an index
+thumbnails.forEach((thumbnail, index) => {
+  thumbnail.addEventListener('click', () => {
+    createAnnotation(index);  // Trigger annotation creation
+  });
+});
+
+
+
+
+
+
+
+const placeholder = document.getElementById('canvasPlaceholder');
+
+// Function to draw the placeholder text on the canvas
+function drawPlaceholderText() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear existing content
+
+    // Set the background color
+    ctx.fillStyle = '#f0f0f0'; // Light gray background
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Set text properties
+    ctx.fillStyle = '#888'; // Gray text color
+    ctx.font = '90px Changa';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Draw text in the center of the canvas
+    ctx.fillText('Your selected image will be displayed here', canvas.width / 2, canvas.height / 2);
+}
+
+// Initial call to display placeholder text
+drawPlaceholderText();
+
+// Event listener for image selection
+imageLoader.addEventListener('change', function () {
+    if (imageLoader.files.length > 0) {
+        placeholder.style.display = 'none'; // Hide the placeholder
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        // Load and display the first selected image
+        const file = imageLoader.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function (event) {
+            const img = new Image();
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Draw the first image
+            }
+            img.src = event.target.result; // Set the image source
+        }
+        
+        reader.readAsDataURL(file); // Read the selected image
+    } else {
+        placeholder.style.display = 'flex'; // Show placeholder if no images are selected
+        drawPlaceholderText(); // Show the placeholder again
+    }
+});
+
+// Initial display of the placeholder when no images are loaded
+placeholder.style.display = 'flex';
+
+
+  // Event listener for image selection
+  imageLoader.addEventListener('change', function () {
+            if (imageLoader.files.length > 0) {
+                placeholder.style.display = 'none'; // Hide the placeholder
+                
+                thumbnailContainer.innerHTML = ''; // Clear existing thumbnails
+                currentIndex = 0; // Reset current index
+
+                // Load selected images
+                const files = Array.from(imageLoader.files);
+                const promises = files.map(file => {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            const img = new Image();
+                            img.onload = function () {
+                                images.push(img); // Store loaded image
+                                const thumbnail = document.createElement('img'); // Create thumbnail
+                                thumbnail.src = event.target.result; // Set thumbnail source
+                                thumbnail.classList.add('thumbnail'); // Add class
+                                thumbnail.addEventListener('click', () => {
+                                    currentIndex = images.indexOf(img); // Set current index
+                                    displayImage(currentIndex); // Display selected image
+                                });
+                                thumbnailContainer.appendChild(thumbnail); // Add thumbnail to the container
+                                resolve();
+                            }
+                            img.src = event.target.result; // Set the image source
+                        }
+                        reader.readAsDataURL(file); // Read the selected image
+                    });
+                });
+
+                // Wait until all images are loaded
+                Promise.all(promises).then(() => {
+                    if (images.length > 0) {
+                        displayImage(currentIndex); // Display the first image
+                    }
+                });
+            } else {
+                placeholder.style.display = 'flex'; // Show placeholder if no images are selected
+                drawPlaceholderText(); // Show the placeholder again
+            }
+        });
+        function displayImage(index) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            const img = images[index];
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Draw the image on the canvas
+            
+            // Update thumbnail highlighting
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach((thumbnail, idx) => {
+                thumbnail.classList.toggle('active', idx === index); // Highlight active thumbnail
+            });
+        }
+
+        
+
+        // Function to highlight the thumbnail border based on its state
+        function updateThumbnailHighlighting() {
+            const thumbnails = document.querySelectorAll('.image-thumbnail');
+            thumbnails.forEach((thumbnail, index) => {
+                thumbnail.classList.remove('selected-orange', 'selected-blue'); // Remove all previous highlights
+        
+                if (index === currentImageIndex) {
+                    // If the thumbnail is the current image, apply the blue highlight
+                    thumbnail.classList.add('selected-blue');
+                } else if (images[index].annotations.length > 0) {
+                    // If it has annotations and is not the selected image, apply the orange highlight
+                    thumbnail.classList.add('selected-orange');
+                }
+            });
+        }
+        const customClassInput = document.getElementById('customClassInput');
+const addCustomClassButton = document.getElementById('addCustomClassButton');
+
+
+        const predefinedColors = [
+    "#FF5733", // Bright Orange
+    "#33FF57", // Bright Green
+    "#3357FF", // Bright Blue
+    "#FF33A6", // Vibrant Pink
+    "#FFBD33", // Golden Yellow
+    "#33FFF1", // Aqua
+    "#FF33D1", // Hot Pink
+    "#FF8C33", // Bright Coral
+    "#7D33FF", // Purple
+    "#33FF8C", // Lime Green
+    "#8C33FF", // Violet
+    "#FF5733", // Bold Red-Orange
+    "#33A6FF", // Sky Blue
+    "#A6FF33", // Neon Yellow-Green
+    "#FF33B5"  // Magenta
+];
+
+// Mapping of predefined classes to their distinct colors (now different from the predefined set)
+const colorMapping = {
+    "Cracks": "#FF6347", // Tomato Red
+    "Seepage": "#32CD32", // Lime Green
+    "Paint": "#1E90FF", // Dodger Blue
+    "Leakage": "#FFD700" // Gold
+};
+
+        
+
+        // Index to keep track of the next color to use
+        let colorIndex = 0;
+
+
+
+// Event listener for adding a new class
+addCustomClassButton.addEventListener('click', () => {
+    const className = customClassInput.value.trim();
+
+    if (className) {
+        // Check if the class already exists in the mapping
+        if (!colorMapping[className]) {
+            // Assign the next color from the predefined list
+            colorMapping[className] = predefinedColors[colorIndex];
+
+            // Update colorIndex to use the next color in the list
+            colorIndex = (colorIndex + 1) % predefinedColors.length;
+
+            // Create a new radio button for the custom class
+            const newClassLabel = document.createElement('label');
+            const newClassInput = document.createElement('input');
+            newClassInput.type = 'radio';
+            newClassInput.name = 'classType';
+            newClassInput.value = className;
+
+            // Apply the color from the mapping to the label text
+            newClassLabel.style.color = colorMapping[className];
+            newClassLabel.appendChild(newClassInput);
+            newClassLabel.appendChild(document.createTextNode(className));
+
+            // Append the new class label to the class list
+            const classList = document.getElementById('classList');
+            classList.appendChild(newClassLabel);
+
+            // Clear the input field
+            customClassInput.value = '';
+
+        } 
+    } 
+});
+
+
+confirmButton.addEventListener("click", () => {
+    console.log("Confirm button clicked.");
+  
+    // Get the selected class type
+    const selectedClass = document.querySelector('input[name="classType"]:checked');
+    if (!selectedClass) {
+        alert("Please select a class.");
+        console.warn("No class selected.");
+        return;
+    }
+  
+    const selectedClassName = selectedClass.value;
+    console.log("Selected class:", selectedClassName);
+  
+    // Determine severity level based on checkbox selection
+    const isMajorDefect = document.getElementById("severityLevel").checked;
+    const isMinorDefect = document.getElementById("severityLevelMinor").checked;
+  
+    let severityLevel;
+    if (isMajorDefect && isMinorDefect) {
+        alert("Please select only one defect level (either Major or Minor).");
+        console.warn("Both checkboxes selected.");
+        return;
+    } else if (isMajorDefect) {
+        severityLevel = "major";
+    } else if (isMinorDefect) {
+        severityLevel = "minor";
+    } else {
+        alert("Please select a defect level.");
+        console.warn("No defect level selected.");
+        return;
+    }
+  
+    console.log("Severity level:", severityLevel);
+  
+    // Ensure startX, startY, endX, and endY are defined
+    // (assuming these values are already set earlier in your code)
+    if (typeof startX === "undefined" || typeof startY === "undefined" || 
+        typeof endX === "undefined" || typeof endY === "undefined") {
+        console.error("Coordinates are not defined.");
+        return;
+    }
+  
+    
+    
+    // Annotation object setup based on your existing code
+    const annotation = {
+        startX: startX,
+        startY: startY,
+        width: endX - startX,
+        height: endY - startY,
+        class: selectedClassName,
+        severity: severityLevel,
+        color: colorMapping[selectedClassName] || "black"
+    };
+    
+
+
+    console.log("Annotation:", annotation);
+
+    if (!images[currentImageIndex]) {
+        console.error("No current image found.");
+        return;
+    }
+
+    images[currentImageIndex].annotations.push(annotation);
+    drawImageAndAnnotations();
+    popup.style.display = "none";
+    isDrawing = false;
+});
+
+
+
+confirmButton.addEventListener('click', () => { // Corrected line
+    const selectedClass = document.querySelector('input[name="classType"]:checked');
+    const severityLevel = severitybox.value;
+
+    // Check if a class is selected
+    if (!selectedClass) {
+        alert('Please select a class .');
+        return;
+    }
+
+    const finalClass = selectedClass.value; // Get the selected class value
+    const selectedColor = colorMapping[finalClass]; // Get the color from colorMapping
+    const width = endX - startX;
+    const height = endY - startY;
+
+    if (width > 0 && height > 0) {
+        if (finalClass && severityLevel) {
+            // Add the annotation to the current image
+            images[currentImageIndex].annotations.push({
+                startX: startX,
+                startY: startY,
+                width: endX - startX,
+                height: endY - startY,
+                class: selectedClassName,
+                severityLevel: severityLevel,
+                color: colorMapping[selectedClassName] || "black"
+            });
+
+
+            drawImageAndAnnotations(); // Redraw the image with the new annotation
+            
+        } else {
+            alert('Please select a severity level.');
+        }
+    } else {
+        alert('Please select a valid area for the annotation.');
+    }
+});
+
+
+// Next arrow button event listener for navigating images
+nextButton.addEventListener('click', () => {
+    currentImageIndex++;
+    if (currentImageIndex >= images.length) {
+        currentImageIndex = 0; // Loop back to the first image if at the end
+    }
+    drawImageAndAnnotations(); // Redraw the image and its annotations
+    updateThumbnailHighlighting(); // Update thumbnail highlighting
+    updateCommentBox(currentImageIndex); // Update the comment box
+});
+
+
+
+// Function to create a thumbnail for the image
+function createThumbnail(src) {
+    const thumbnailContainer = document.createElement('div');
+    thumbnailContainer.className = 'thumbnail-container'; // Style container for fixed size
+
+    const thumbnail = document.createElement('img');
+    thumbnail.src = src;
+    thumbnail.className = 'image-thumbnail'; // Ensure this class matches your CSS
+
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '&times;'; // X symbol
+    deleteButton.className = 'delete-thumbnail-btn';
+    deleteButton.title = 'Remove Image';
+
+    // Style for delete button (you can adjust in CSS)
+    deleteButton.style.position = 'absolute';
+    deleteButton.style.top = '5px';
+    deleteButton.style.right = '5px';
+    deleteButton.style.backgroundColor = 'rgba(255,0,0,0.7)';
+    deleteButton.style.color = 'white';
+    deleteButton.style.border = 'none';
+    deleteButton.style.borderRadius = '50%';
+    deleteButton.style.width = '25px';
+    deleteButton.style.height = '25px';
+    deleteButton.style.display = 'flex';
+    deleteButton.style.alignItems = 'center';
+    deleteButton.style.justifyContent = 'center';
+    deleteButton.style.cursor = 'pointer';
+
+    // Add click event to delete the image
+    // Add click event to delete the image
+deleteButton.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent thumbnail click event
+
+    // Confirm deletion before proceeding
+    if (confirm("Are you sure you want to delete this image?")) {
+        // Find the index of the image to be deleted
+        const indexToDelete = images.findIndex(img => img.image.src === src);
+
+        if (indexToDelete !== -1) {
+            // Remove the image from the images array
+            images.splice(indexToDelete, 1);
+
+            // Remove the thumbnail container from the DOM
+            thumbnailContainer.remove();
+
+            // Adjust current image index if needed
+            if (currentImageIndex >= images.length) {
+                currentImageIndex = images.length - 1;
+            }
+
+            // Redraw the current image or placeholder if no images left
+            if (images.length > 0) {
+                drawImageAndAnnotations();
+                updateThumbnailHighlighting();
+            } else {
+                // If no images left, show placeholder
+                drawPlaceholderText();
+                currentImageIndex = 0;
+            }
+        }
+    }
+});
+
+
+
+    // Append delete button to thumbnail container
+    thumbnailContainer.style.position = 'relative';
+    thumbnailContainer.appendChild(thumbnail);
+    thumbnailContainer.appendChild(deleteButton);
+
+    thumbnail.onclick = () => {
+        currentImageIndex = images.findIndex(img => img.image.src === src);
+        drawImageAndAnnotations();
+        updateThumbnailHighlighting(); // Update highlighting based on the clicked thumbnail
+    };
+
+    imageListContainer.appendChild(thumbnailContainer);
+}
+
+
+// Call this function to create thumbnails for all previously uploaded images
+function loadExistingThumbnails() {
+    images.forEach(imgObj => {
+        createThumbnail(imgObj.image.src); // Create thumbnail for each existing image
+    });
+}
+
+// Call this function when the page loads or when images are initially populated
+loadExistingThumbnails();
+
+
+function selectImage(index) {
+    // Remove blue border from previously selected image
+    if (selectedImageIndex !== null) {
+        const prevSelected = document.querySelector(`.thumbnail[data-index='${selectedImageIndex}']`);
+        prevSelected.classList.remove('selected-blue');
+    }
+
+    // Add blue border to the new selected image
+    const currentSelected = document.querySelector(`.thumbnail[data-index='${index}']`);
+    currentSelected.classList.add('selected-blue');
+    selectedImageIndex = index;
+}
+
+// Function to annotate the selected image
+function annotateImage() {
+    if (selectedImageIndex !== null) {
+        const annotatedImage = images[selectedImageIndex];
+        annotatedImage.annotated = true;
+
+        // Add blur and tick overlay to the thumbnail
+        const thumbnailContainer = document.querySelector(`.thumbnail[data-index='${selectedImageIndex}']`).parentElement;
+        thumbnailContainer.classList.add('annotated');
+
+        // Add tick overlay
+        const tickOverlay = document.createElement('div');
+        tickOverlay.classList.add('tick-overlay');
+        thumbnailContainer.appendChild(tickOverlay);
+    }
+}
+
+
+let refreshClicked = false; // Flag to track if refresh button has been clicked
+
+function renderSidebarImages() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.innerHTML = ''; // Clear existing thumbnails
+
+    let sortedImages;
+
+    // Check if refresh button was clicked to apply sorting
+    if (refreshClicked) {
+        // Sort images: non-annotated images first
+        sortedImages = images.slice().sort((a, b) => a.annotations.length - b.annotations.length);
+    } else {
+        // If not sorted, use the original order
+        sortedImages = images;
+    }
+
+    // Display sorted images in the sidebar
+    sortedImages.forEach((imgObj, index) => {
+        const thumbnailCanvas = document.createElement('canvas');
+        thumbnailCanvas.className = 'thumbnail';
+        thumbnailCanvas.width = 100; // Set width for the thumbnail
+        thumbnailCanvas.height = 100; // Set height for the thumbnail
+
+        // Draw the thumbnail with blur effect and tick if it has annotations
+        drawThumbnail(imgObj.image, imgObj.annotations.length > 0, thumbnailCanvas);
+
+        // Set up click event for each thumbnail to display it in the main frame
+        thumbnailCanvas.onclick = () => {
+            currentImageIndex = images.indexOf(imgObj);
+            drawImageAndAnnotations();
+            updateThumbnailHighlighting();
+        };
+
+        // Append the canvas to the sidebar
+        sidebar.appendChild(thumbnailCanvas);
+    });
+
+    // Update the main frame to show the first unannotated image (or the first image) after refresh
+    if (refreshClicked) {
+        const firstUnannotatedIndex = sortedImages.findIndex(img => img.annotations.length === 0);
+        currentImageIndex = firstUnannotatedIndex >= 0 ? firstUnannotatedIndex : 0;
+        drawImageAndAnnotations();
+        updateThumbnailHighlighting();
+    }
+}
+
+// Event listener for the refresh button to trigger sorting and render
+document.getElementById('refreshButton').addEventListener('click', () => {
+    refreshClicked = true; // Set the flag to true when refresh is clicked
+    renderSidebarImages();  // Sort and render images
+});
+
+// Initial render without sorting
+function initializeSidebar() {
+    renderSidebarImages(); // Render images in their original order
+}
+
+// Call this function when you initially load images
+initializeSidebar();
+
+
+
+    </script>
+</body>
+</html>

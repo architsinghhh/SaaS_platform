@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Building with Clickable Points</title>
+    <style>
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column; /* Stack elements vertically */
+        }
+
+        .sidebar {
+          width: 100%; /* Full width for sidebar */
+          border-bottom: 2px solid #ccc; /* Border for separation */
+        }
+
+        .main-content {
+          width: 100%; /* Full width for main content */
+          height: 300px; /* Set a fixed height for mobile */
+        }
+
+        .details {
+          width: 100%; /* Full width for details */
+          margin-left: 0; /* No margin on mobile */
+        }
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        display: flex;
+        height: 100vh;
+      }
+
+      .container {
+        display: flex;
+        flex: 1; /* Allow container to grow and fill remaining space */
+      }
+
+      /* Sidebar styles */
+      .sidebar {
+        width: 220px;
+        background-color: #f0f0f0; /* Light background for visibility */
+        padding: 10px;
+        overflow-y: auto; /* Scroll if content exceeds the height */
+        flex-shrink: 0; /* Prevent sidebar from shrinking */
+      }
+
+      .sidebar img {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 10px; /* Space between images */
+        overflow-y: auto;
+      }
+
+      /* Main content styles */
+      .main-content {
+        flex: 1; /* Take remaining space */
+        position: relative;
+        padding: 10px; /* Add padding for better spacing */
+      }
+
+      /* Details styles */
+      .details {
+        width: 400px;
+        padding: 10px;
+        background-color: #e0e0e0; /* Light background for visibility */
+        margin-left: 10px; /* Space between main content and details */
+      }
+
+      #overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: white;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+        z-index: 1000;
+      }
+      #overlay img {
+        max-width: 300px;
+      }
+      #thumbnail-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 97%;
+        height: 200px;
+        background-color: white;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+        overflow-x: auto; /* Add horizontal scrolling */
+        overflow-y: hidden; /* Remove vertical scrolling */
+        white-space: nowrap; /* Prevent wrapping of images */
+        display: flex; /* Add display: flex */
+        gap: 10px;
+      }
+      #thumbnail-container img {
+        /* width: 200px;
+  height: 200px; */
+        margin: 0 10px; /* Remove margin */
+        padding-right: 10; /* Remove padding */
+        cursor: pointer;
+        display: inline-block; /* Display images inline */
+        vertical-align: top; /* Align images to the top */
+        height: 100%; /* Make images take full height */
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body styling */
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      /* Header styling */
+      header {
+        position: fixed;
+        top: 0;
+        right: 0;
+        padding: 10px;
+        z-index: 1000;
+      }
+
+      /* Hamburger menu icon */
+      /* Hamburger menu icon */
+      .menu-icon {
+        width: 40px; /* Increased width */
+        height: 30px; /* Set height to accommodate all lines */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensure even spacing between lines */
+        cursor: pointer;
+        z-index: 9999;
+      }
+
+      .line {
+        width: 100%;
+        height: 4px;
+        background-color: black;
+        margin: 0; /* Remove margin to avoid gaps between lines */
+        transition: all 0.3s ease;
+      }
+
+      /* Navigation bar */
+      nav {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 300px;
+        background-color: rgba(5, 21, 123, 0.5);
+        transform: translateX(100%);
+        transition: transform 0.5s ease;
+        z-index: 9998;
+      }
+
+      nav ul {
+        list-style: none;
+        padding: 50px 20px;
+      }
+
+      nav ul li {
+        margin: 20px 0;
+      }
+
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+
+      nav ul li a:hover {
+        color: lightgray;
+      }
+
+      /* Sections styling */
+      section {
+        padding: 100px 20px;
+        height: 100vh;
+      }
+
+      #home {
+        background-color: lightblue;
+      }
+
+      #services {
+        background-color: lightgreen;
+      }
+
+      /* Active navigation */
+      .nav-visible {
+        transform: translateX(0);
+      }
+      .close-icon {
+        font-size: 30px; /* Size of the close icon */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        margin: 10px; /* Spacing from the edges */
+        color: black; /* Color of the icon */
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="menu-icon" onclick="toggleNav()">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+    </header>
+    <nav id="navbar" class="nav-hidden">
+      <div class="close-icon" onclick="toggleNav()">&times;</div>
+      <!-- Close icon -->
+      <ul>
+        <li><a href="afterlogin.html">Projects</a></li>
+        <li><a href="Annotation.html">Annotation</a></li>
+        <li><a href="drone-tab.html">Drone-tab</a></li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <img src="./static/abc.jpg" alt="Image 1" />
+        <img src="./static/abc.jpg" alt="Image 2" />
+        <img src="./static/abc.jpg" alt="Image 3" />
+        <img src="./static/abc.jpg" alt="Image 4" />
+        <img src="./static/abc.jpg" alt="Image 5" />
+        <img src="./static/abc.jpg" alt="Image 6" />
+        <img src="./static/abc.jpg" alt="Image 7" />
+        <img src="./static/abc.jpg" alt="Image 8" />
+      </div>
+
+      <!-- Main content area -->
+      <div class="main-content">
+        <canvas id="threejs-canvas"></canvas>
+        <!-- Overlay with main image -->
+        <div id="overlay">
+          <img id="overlay-image" src="" alt="Building Image" />
+        </div>
+        <!-- Thumbnails container -->
+        <div id="thumbnail-container">
+          <!-- Thumbnails will be added dynamically here -->
+        </div>
+      </div>
+
+      <!-- Details section -->
+      <div class="details">
+        <h3>Crack</h3>
+        <div class="slider" style="margin-top: 10px">
+          <label for="severity">Severity</label>
+          <input id="severity" name="severity" type="range" min="0" max="5" />
+        </div>
+        <textarea
+          class="comment"
+          placeholder="Enter comment here."
+          style="margin-top: 10px; width: 100%; height: 100px"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.min.js"></script> -->
+    <script>
+      // Function to toggle navigation visibility
+      function toggleNav() {
+        var nav = document.getElementById("navbar");
+        var lines = document.querySelectorAll(".line");
+
+        // Toggle the 'nav-visible' class to open/close the navigation
+        nav.classList.toggle("nav-visible");
+
+        // Update the appearance of the hamburger icon
+        lines.forEach((line) => {
+          if (nav.classList.contains("nav-visible")) {
+            line.classList.add("open"); // Change to X
+          } else {
+            line.classList.remove("open"); // Change back to hamburger
+          }
+        });
+      }
+
+      // Close the navigation bar when clicking outside of it
+      document.addEventListener("click", function (event) {
+        var nav = document.getElementById("navbar");
+        var menuIcon = document.querySelector(".menu-icon");
+        var closeIcon = document.querySelector(".close-icon");
+
+        // Check if click is outside the navigation and menu icon
+        if (
+          !nav.contains(event.target) &&
+          !menuIcon.contains(event.target) &&
+          !closeIcon.contains(event.target)
+        ) {
+          nav.classList.remove("nav-visible"); // Close the navigation
+          var lines = document.querySelectorAll(".line");
+          lines.forEach((line) => line.classList.remove("open")); // Change back to hamburger
+        }
+      });
+
+      // Optional: You can use this function for navigation
+      function goHome() {
+        alert("Navigating to Home!");
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js";
+      import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+      import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+
+      // Initialize scene, camera, and renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        5,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(60, 10, 30);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("threejs-canvas"),
+        antialias: true,
+        alpha: true, // Allows transparency
+      });
+      renderer.setSize(window.innerWidth - 600, window.innerHeight - 200); // Adjust size for sidebar, details, and thumbnails
+      renderer.setClearColor(0xffffff); // Set background to white
+
+      // Add light
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(10, 10, 10);
+      scene.add(directionalLight);
+
+      // Add OrbitControls
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      // Load the building model (GLB)
+      const gltfLoader = new GLTFLoader();
+      let object; // Declare globally to access later
+
+      gltfLoader.load(
+        "./models/building.glb", // Path to your .glb model
+        (gltf) => {
+          object = gltf.scene;
+          scene.add(object);
+
+          // Center the object
+          const box = new THREE.Box3().setFromObject(object);
+          const center = box.getCenter(new THREE.Vector3());
+          object.position.sub(center);
+        },
+        undefined,
+        (error) => {
+          console.error("Error loading building model:", error);
+        }
+      );
+
+      // Add clickable points
+      const points = [
+        {
+          position: new THREE.Vector3(0, 0, 1),
+          images: "./static/building.png",
+          thumbnailImages: [
+            "./static/building.png",
+            "./static/building2.png",
+            "./static/building3.png",
+            "./static/building4.png",
+            "./static/building5.png",
+            "./static/building5.png",
+            "./static/building5.png",
+          ],
+        },
+        {
+          position: new THREE.Vector3(0, 1.5, 1),
+          image: "./static/21.png",
+          thumbnailImages: [
+            "./static/21.png",
+            "./static/22.png",
+            "./static/23.png",
+            "./static/24.png",
+            "./static/25.png",
+            "./static/26.png",
+          ],
+        },
+        {
+          position: new THREE.Vector3(0, 0.5, -0.7),
+          image: "./static/31.png",
+          thumbnailImages: [
+            "./static/31.png",
+            "./static/32.png",
+            "./static/33.png",
+            "./static/34.png",
+            "./static/35.png",
+            "./static/36.png",
+          ],
+        },
+      ];
+
+      const pointMeshes = points.map((point) => {
+        const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.copy(point.position);
+        scene.add(sphere);
+        return sphere;
+      });
+
+      // Convert 3D position to 2D screen coordinates
+      function toScreenPosition(obj, camera) {
+        const vector = new THREE.Vector3();
+        const widthHalf = 0.5 * renderer.domElement.clientWidth; // Use clientWidth
+        const heightHalf = 0.5 * renderer.domElement.clientHeight; // Use clientHeight
+
+        obj.updateMatrixWorld();
+        vector.setFromMatrixPosition(obj.matrixWorld);
+        vector.project(camera);
+
+        vector.x = vector.x * widthHalf + widthHalf;
+        vector.y = -(vector.y * heightHalf) + heightHalf;
+
+        return { x: vector.x, y: vector.y };
+      }
+
+      // Update the main image when a thumbnail is clicked
+      function updateMainImage(imageSrc) {
+        const overlayImage = document.getElementById("overlay-image");
+        overlayImage.src = imageSrc;
+      }
+
+      // Add thumbnails corresponding to the clickable points
+      // const thumbnailImages = [
+      //   "./static/building.png",
+      //   "./static/building2.png",
+      //   "./static/building3.png",
+      //   "./static/building4.png",
+      //   "./static/building5.png",
+      //   "./static/building5.png",
+      //   "./static/building5.png",
+      // ];
+
+      // Create a larger bounding sphere around each point
+      const boundingSpheres = points.map((point) => {
+        const geometry = new THREE.SphereGeometry(0.7, 16, 16); // Adjust the radius as needed
+        const material = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          opacity: 0,
+          transparent: true,
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.copy(point.position);
+        scene.add(sphere);
+        return sphere;
+      });
+
+      // Update the click event handler
+      document.addEventListener("click", async (event) => {
+        const thumbnailContainer = document.getElementById(
+          "thumbnail-container"
+        );
+        if (thumbnailContainer.contains(event.target)) {
+          return; // Ignore clicks on thumbnails
+        }
+
+        const mouse = new THREE.Vector2();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / (window.innerHeight - 200)) * 2 + 1; // Adjust for thumbnails container
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(boundingSpheres);
+
+        if (intersects.length > 0) {
+          const clickedPoint = intersects[0].object;
+
+          // Find the corresponding point in the points array
+          const point = points.find(
+            (p) =>
+              Math.abs(p.position.x - clickedPoint.position.x) < 0.1 &&
+              Math.abs(p.position.y - clickedPoint.position.y) < 0.1 &&
+              Math.abs(p.position.z - clickedPoint.position.z) < 0.1
+          );
+
+          if (point) {
+            try {
+              // Fetch images using project ID and token
+              async function fetchImages(projectId, token) {
+                console.log("function called");
+                const response = await fetch(
+                  `http://127.0.0.1:5000/projects/${projectId}/images`,
+                  {
+                    method: "GET",
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+
+                if (!response.ok) {
+                  throw new Error("Failed to fetch images");
+                }
+
+                const data = await response.json();
+                return data; // Assuming the API returns an object with images
+              }
+              const urlParams = new URLSearchParams(window.location.search);
+              const projectId = urlParams.get("project_id"); // Get project_id from URL
+
+              const token = localStorage.getItem("token");
+              const images = await fetchImages(projectId, token);
+              console.log(images);
+              // Assuming images are returned as an array with main and thumbnails
+              const mainImage = images.main; // Adjust based on your API response
+              const thumbnailImages = images; // Adjust based on your API response
+
+              // Update overlay image and thumbnails
+              const overlayImage = document.getElementById("overlay-image");
+              overlayImage.src = mainImage;
+              const overlay = document.getElementById("overlay");
+              overlay.style.display = "block";
+
+              thumbnailContainer.innerHTML = "";
+              thumbnailImages.forEach((imageSrc) => {
+                const imgElement = document.createElement("img");
+                imgElement.src = imageSrc;
+                imgElement.alt = "Thumbnail";
+                imgElement.style.width = "200px";
+                imgElement.style.height = "200px";
+                imgElement.style.cursor = "pointer";
+                imgElement.addEventListener("click", () =>
+                  updateMainImage(imageSrc)
+                );
+                thumbnailContainer.appendChild(imgElement);
+              });
+            } catch (error) {
+              console.error("Error fetching images:", error);
+            }
+          }
+        } else {
+          const overlay = document.getElementById("overlay");
+          overlay.style.display = "none";
+        }
+      });
+
+      // Handle window resizing
+      window.addEventListener("resize", () => {
+        const canvasContainer = document.getElementById("threejs-canvas");
+        camera.aspect =
+          canvasContainer.clientWidth / canvasContainer.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(
+          canvasContainer.clientWidth,
+          canvasContainer.clientHeight - 200
+        ); // Adjust size for sidebar, details, and thumbnails
+      });
+
+      // Animation loop
+      const renderloop = () => {
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(renderloop);
+      };
+
+      renderloop();
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get("project_id"); // Get project_id from URL
+      function updateLinks() {
+        if (projectId) {
+          const links = document.querySelectorAll("#navbar a");
+          links.forEach((link) => {
+            const url = new URL(link.href);
+            url.searchParams.set("project_id", projectId); // Append project_id to the URL
+            link.href = url.toString(); // Update the link's href attribute
+          });
+        }
+      }
+      window.onload = updateLinks;
+    </script>
+  </body>
+</html>
