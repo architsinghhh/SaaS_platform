@@ -1,0 +1,8 @@
+Model Information:
+* title:	Drone 3D
+* source:	https://sketchfab.com/3d-models/drone-3d-5b9def2ac64c4a4285035ada65e4f0c1
+* author:	panchalyogendra2194 (https://sketchfab.com/panchalyogendra2194)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
